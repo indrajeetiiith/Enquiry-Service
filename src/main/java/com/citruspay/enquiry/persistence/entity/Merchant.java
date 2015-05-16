@@ -34,6 +34,10 @@ import org.hibernate.envers.NotAudited;
 
 
 @Entity
+<<<<<<< HEAD
+=======
+
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 @Table(name = "MER_MERCHANT")
 public class Merchant implements Serializable {
 
@@ -59,6 +63,7 @@ public class Merchant implements Serializable {
 	private String merchantUrlPart;
 
 
+<<<<<<< HEAD
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
@@ -67,6 +72,8 @@ public class Merchant implements Serializable {
 	@JsonIgnore
 	private Date lastModified;
 
+=======
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 	@OneToMany(mappedBy = "merchant", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@NotAudited
@@ -86,6 +93,21 @@ public class Merchant implements Serializable {
 	private String blockMailers;
 
 	private String perfTemplate = "checkout_nitro";
+<<<<<<< HEAD
+=======
+	/*
+	 * @OneToOne
+	 * 
+	 * @JoinColumn(name="amex_cat_code_id") private AmexCategoryCode
+	 * amexCategoryCode;
+	 */
+//	TODO: PPD DEPENDENCY REMOVAL
+//	@JsonIgnore
+//	@OneToMany(mappedBy = "merchantPrepaidSchemePk.merchant")
+//	@LazyCollection(LazyCollectionOption.TRUE)
+//	@NotAudited
+//	private List<PrepaidSemiclosedMerchants> prepaidSemiclosedMerchants;
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 	
 	public String getPerfTemplate() {
 		return perfTemplate;
@@ -115,6 +137,10 @@ public class Merchant implements Serializable {
 	
 	private boolean nitroIframe;
 	
+<<<<<<< HEAD
+=======
+	private boolean nitroIframeMobile;
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 
 	public Merchant() {
 	}
@@ -124,7 +150,10 @@ public class Merchant implements Serializable {
 		this.name = name;
 		this.siteUrl = siteUrl;
 		this.vanityUrlPart = vanityUrlPart;
+<<<<<<< HEAD
 		this.created = new Date();
+=======
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 	}
 
 	public Integer getId() {
@@ -161,6 +190,7 @@ public class Merchant implements Serializable {
 	}
 
 
+<<<<<<< HEAD
 	public void setCreated(Date created) {
 		this.created = created;
 	}
@@ -177,6 +207,8 @@ public class Merchant implements Serializable {
 		this.lastModified = lastModified;
 	}
 
+=======
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 	@Override
 	public String toString() {
 		return "Merchant [id=" + id + ", name=" + name + ", siteUrl=" + siteUrl
@@ -248,6 +280,16 @@ public class Merchant implements Serializable {
 		this.autoDetectDevice = autoDetectDevice;
 	}
 
+<<<<<<< HEAD
+=======
+	/*
+	 * public AmexCategoryCode getAmexCategoryCode() { return amexCategoryCode;
+	 * }
+	 * 
+	 * public void setAmexCategoryCode(AmexCategoryCode amexCategoryCode) {
+	 * this.amexCategoryCode = amexCategoryCode; }
+	 */
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 
 	public String getPanCard() {
 		return panCard;
@@ -265,7 +307,10 @@ public class Merchant implements Serializable {
 		this.panCardValidated = panCardValidated;
 	}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 	public String getNotifyUrl() {
 		return notifyUrl;
 	}
@@ -296,6 +341,7 @@ public class Merchant implements Serializable {
 		this.nitroForMerchant = nitroForMerchant;
 	}
 	
+<<<<<<< HEAD
 	// TODO - Need to get value from DB
 	// currently check only with RechangeItnow
 	public boolean isNitroForMerchant() {
@@ -310,6 +356,8 @@ public class Merchant implements Serializable {
 	public boolean getNitro() {
 		return nitro;
 	}
+=======
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 
 	public boolean isCookieBased() {
 		return cookieBased;
@@ -352,5 +400,15 @@ public class Merchant implements Serializable {
 		this.nitroIframe = nitroIframe;
 	}
 
+<<<<<<< HEAD
 
+=======
+	public boolean isNitroIframeMobile() {
+		return nitroIframeMobile;
+	}
+
+	public void setNitroIframeMobile(boolean nitroIframeMobile) {
+		this.nitroIframeMobile = nitroIframeMobile;
+	}
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 }

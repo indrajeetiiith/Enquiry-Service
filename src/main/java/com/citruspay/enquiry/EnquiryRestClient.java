@@ -9,12 +9,16 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
  
+<<<<<<< HEAD
 
 
 import org.json.JSONObject;
 
 import com.citruspay.enquiry.api.EnquiryRequest;
 import com.citruspay.enquiry.api.EnquiryTransactionBase;
+=======
+import org.json.JSONObject;
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
  
 /**
  * @author Crunchify.com
@@ -35,6 +39,7 @@ public class EnquiryRestClient {
             while ((line = br.readLine()) != null) {
                 string += line + "\n";
             }
+<<<<<<< HEAD
             EnquiryRequest enquiryRequest = new EnquiryRequest();
             enquiryRequest.setMerchantAccessKey("27AOYSJCQOR6VZ39V7JV");
             enquiryRequest.setMerchantTxnId("TXN55100");
@@ -45,6 +50,13 @@ public class EnquiryRestClient {
             System.out.println(jsonObject);
  
 /*            // Step2: Now pass JSON File Data to REST Service, TODO commenting for the time being
+=======
+ 
+            JSONObject jsonObject = new JSONObject(string);
+            System.out.println(jsonObject);
+ 
+            // Step2: Now pass JSON File Data to REST Service
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
             try {
             	System.out.println("line 39");
                 URL url = new URL("http://localhost:8080/EnquiryService/service/enquiryService");
@@ -69,11 +81,19 @@ public class EnquiryRestClient {
                 System.out.println("\nError while calling REST Service");
                 System.out.println(e);
             }
+<<<<<<< HEAD
  			       }*/
+=======
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
  
             br.close();
         } catch (Exception e) {
             e.printStackTrace();
+<<<<<<< HEAD
     }
 }
+=======
+        }
+    }
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 }

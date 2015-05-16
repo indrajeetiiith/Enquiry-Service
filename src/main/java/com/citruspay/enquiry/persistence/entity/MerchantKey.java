@@ -38,6 +38,12 @@ public class MerchantKey implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private KeyType keyType;
 
+<<<<<<< HEAD
+=======
+	private String keyString;
+
+	private Integer useKey;
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 
 	private String secretId;
 
@@ -62,6 +68,13 @@ public class MerchantKey implements Serializable {
 		this.keyType = keyType;
 	}
 
+<<<<<<< HEAD
+=======
+	public String getKeyString() {
+		return keyString;
+	}
+
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 	public String getSecretId() {
 		return secretId;
 	}
@@ -70,6 +83,24 @@ public class MerchantKey implements Serializable {
 		this.secretId = secretId;
 	}
 
+<<<<<<< HEAD
+=======
+	public void setKeyString(String keyString) {
+		this.keyString = keyString;
+	}
+
+	public Boolean getUseKey() {
+		return useKey != null && useKey == 1;
+	}
+
+	public void setUseKey(Boolean checked) {
+		if (checked) {
+			this.useKey = 1;
+		} else {
+			this.useKey = 0;
+		}
+	}
+>>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 
 	@JsonIgnore
 	public Merchant getMerchant() {

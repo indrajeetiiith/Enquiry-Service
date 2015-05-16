@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" 
+	version="2.0">
+	<persistence-unit name="enquiry-service">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<class>com.citruspay.enquiry.persistence.entity.Merchant</class>
+		<class>com.citruspay.enquiry.persistence.entity.MerchantKey</class>
+		
+		<properties>
+			<property name="hibernate.show_sql" value="true"/>
+			<property name="hibernate.format_sql" value="true"/>
+			<property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>
+			<property name="hibernate.connection.charSet" value="UTF-8"/>
+			<property name="hibernate.connection.release_mode" value="after_transaction"/>
+						<property name="javax.persistence.jdbc.user" value="root" />
+						<property name="javax.persistence.jdbc.password" value="root" />
+						<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+						<property name="hibernate.show_sql" value="false" />
+						<property name="hibernate.format_sql" value="true" />
+						<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+						<property name="hibernate.hbm2ddl.auto" value="validate" />
+						<property name="hibernate.auditable" value="false" />
+						<property name="hibernate.listeners.envers.autoRegister" value="false" />
+
+ 
+			<!-- Audit -->
+<!-- 			<property name="hibernate.ejb.event.post-insert"
+			value="org.hibernate.ejb.event.EJB3PostInsertEventListener,org.hibernate.envers.event.AuditEventListener" />
+			<property name="hibernate.ejb.event.post-update"
+			value="org.hibernate.ejb.event.EJB3PostUpdateEventListener,org.hibernate.envers.event.AuditEventListener" />
+			<property name="hibernate.ejb.event.post-delete"
+			value="org.hibernate.ejb.event.EJB3PostDeleteEventListener,org.hibernate.envers.event.AuditEventListener" />
+			<property name="hibernate.ejb.event.pre-collection-update"
+			value="org.hibernate.envers.event.AuditEventListener" />
+			<property name="hibernate.ejb.event.pre-collection-remove"
+			value="org.hibernate.envers.event.AuditEventListener" />
+			<property name="hibernate.ejb.event.post-collection-recreate"
+			value="org.hibernate.envers.event.AuditEventListener" /> -->
+		</properties>
+	</persistence-unit>
+</persistence>

@@ -11,6 +11,9 @@ import java.util.Set;
 
 public class CommonUtil {
 
+	public static final int DECIMAL_PLACES = 2;
+	public static final int EIGHT_DECIMAL_PLACES = 8;
+
 	public static boolean isEmpty(String str) {
 		if (str == null || str.length() <= 0) {
 			return true;

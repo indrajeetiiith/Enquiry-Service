@@ -17,7 +17,7 @@
 						<property name="javax.persistence.jdbc.user" value="root" />
 						<property name="javax.persistence.jdbc.password" value="root" />
 						<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
-						<property name="hibernate.show_sql" value="false" />
+						<property name="hibernate.show_sql" value="true" />
 						<property name="hibernate.format_sql" value="true" />
 						<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
 						<property name="hibernate.hbm2ddl.auto" value="validate" />
@@ -26,7 +26,7 @@
 
  
 			<!-- Audit -->
-<!-- 			<property name="hibernate.ejb.event.post-insert"
+<!-- 		<property name="hibernate.ejb.event.post-insert"
 			value="org.hibernate.ejb.event.EJB3PostInsertEventListener,org.hibernate.envers.event.AuditEventListener" />
 			<property name="hibernate.ejb.event.post-update"
 			value="org.hibernate.ejb.event.EJB3PostUpdateEventListener,org.hibernate.envers.event.AuditEventListener" />

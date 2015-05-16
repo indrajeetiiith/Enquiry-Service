@@ -3,8 +3,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.citruspay.CommonUtil;
+import com.citruspay.enquiry.persistence.entity.Transaction;
 import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.implementation.MerchantDAOImpl;
+import com.citruspay.enquiry.persistence.implementation.TransactionDAOImpl;
 import com.citruspay.enquiry.api.EnquiryResponse;
 import com.citruspay.enquiry.api.EnquiryRequest;
 
@@ -39,6 +41,20 @@ public class EnquiryTransactionBase {
 			}
 			LOGGER.debug("Enquiry API : Txn Enquiry request received for :"
 					+ merchant.getName() + ":id=" + transactionId);
+			// Get last modified transaction's pg for enquiry call
+			Transaction txn =new TransactionDAOImpl().getLastTxnByMtxAndMerchant(
+					transactionId, merchant);
+
+			// Validate transaction
+			if (CommonUtil.isNull(txn)) {
+				LOGGER.error("Enquiry API : Txn not found for given txn id in citrus system:"
+						+ merchant.getName() + ":" + transactionId);
+			}
+			System.out.println("-----transaction = "+txn.getLastModified());
+//			System.out.println("-----transaction = "+txn+" tx.getCreated()="+txn.getCreated()+"tx.getTransactionType().name()="+txn.getTransactionType().name()+"tx.getMerchantRefundTxId()=");/*+txn.getMerchantRefundTxId()+"tx.getPgTxResp()="
+//					+txn.getPgTxResp().getAuthIdCode()+ "txn.getPgTxResp().getAuthIdCode()="+txn.getPgTxResp().getIssuerRefNo());*/
+
+
 
 
 		} catch (Exception ex) {

@@ -12,7 +12,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java-version>1.7</java-version>
 		<glassfish-jersey>2.17</glassfish-jersey>
-<<<<<<< HEAD
 		<junit.version>4.11</junit.version>
 		<org.slf4j-version>1.5.10</org.slf4j-version>
 		
@@ -61,15 +60,6 @@
 			</exclusions>
 			<scope>compile</scope>
 		</dependency>
-=======
-		<hibernate>4.3.6.Final</hibernate>
-		<junit.version>4.11</junit.version>
-		<slf4jVersion>1.6.1</slf4jVersion>
-		<jcl-over-slf4j.version>1.7.5</jcl-over-slf4j.version>
-	</properties>
-  
-  <dependencies>
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
   		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
@@ -125,7 +115,6 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-<<<<<<< HEAD
     			<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -143,8 +132,6 @@
 			<version>2.4</version>
 		</dependency>
     	
-=======
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
@@ -162,7 +149,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-<<<<<<< HEAD
 				<dependency>
 			<groupId>com.fasterxml</groupId>
 			<artifactId>jackson-module-hibernate</artifactId>
@@ -174,8 +160,6 @@
   			<version>4.1.0.Final</version>
 		</dependency>
 		
-=======
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>

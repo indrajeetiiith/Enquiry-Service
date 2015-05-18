@@ -36,6 +36,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
+import com.citruspay.enquiry.persistence.entity.PaymentDetail;
 import com.citruspay.enquiry.persistence.entity.Amount;
 import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.entity.TransactionStatus;
@@ -57,6 +58,8 @@ public class Transaction implements Serializable {
 	@ManyToOne
 	private Merchant merchant;
 
+	private Integer paymentModeChange;
+
 	@NotNull
 	@Size(min = 1)
 	private String merchantTxId;
@@ -74,21 +77,68 @@ public class Transaction implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Version
 	private Date lastModified;
+	
+	private Integer pgId;
 
+	@NotNull
+	private TransactionStatus status;
+
+
+	public TransactionStatus getStatus() {
+		return status;
+	}
+	public void setStatus(TransactionStatus status) {
+		this.status = status;
+	}
+	public Integer getPgId() {
+		return pgId;
+	}
+	public void setPgId(Integer pgId) {
+		this.pgId = pgId;
+	}
 	@Embedded
 	@NotNull
 	@Valid
 	private Amount orderAmount;
 	
+	@OneToOne
+	private PaymentDetail paymentDetails;
+
+	
+	public PaymentDetail getPaymentDetails() {
+		return paymentDetails;
+	}
+	public void setPaymentDetails(PaymentDetail paymentDetails) {
+		this.paymentDetails = paymentDetails;
+	}
+	public Date getCreated() {
+		return created;
+	}
+	public void setCreated(Date created) {
+		this.created = created;
+	}
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
+
+	public Integer getPaymentModeChange() {
+		return paymentModeChange;
+	}
+	public void setPaymentModeChange(Integer paymentModeChange) {
+		this.paymentModeChange = paymentModeChange;
+	}
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append(id).append(",");
 		sb.append(txId).append(",");
 		sb.append(merchantTxId).append(",");
 		sb.append(orderAmount).append(",");
+		if (paymentDetails != null) {
+			sb.append(paymentDetails).append(",");
+		}
+		sb.append(status).append(",");
+
+
 		if (pgTxResp != null) {
 			sb.append(pgTxResp).append(",");
 		}

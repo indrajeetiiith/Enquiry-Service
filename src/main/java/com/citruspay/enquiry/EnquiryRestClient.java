@@ -17,7 +17,7 @@ import com.citruspay.enquiry.api.EnquiryRequest;
 import com.citruspay.enquiry.api.EnquiryTransactionBase;
  
 /**
- * @author Crunchify.com
+ * @author Indrajeet Kumar
  * 
  */
  

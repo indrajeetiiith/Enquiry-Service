@@ -6,8 +6,15 @@
  */
 package com.citruspay;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+
+import com.citruspay.JDateUtil;
+import com.citruspay.enquiry.persistence.entity.PaymentMode;
 
 public class CommonUtil {
 
@@ -56,5 +63,43 @@ public class CommonUtil {
 		}
 		return str;
 	}
+	public static boolean isCreditOrDebitCard(PaymentMode paymentMode) {
+		if (PaymentMode.CREDIT_CARD.equals(paymentMode)
+				|| PaymentMode.DEBIT_CARD.equals(paymentMode) 
+				|| PaymentMode.EMI.equals(paymentMode)) {
+			return true;
+		}
+		return false;
+	}
+	public static boolean validateDateTime(Date txnCreatedDate,
+			String dailySettlementHr, String dailySettlementMin) {
+
+		Date currentDate = new Date();
+		DateTime currentDateTime = JDateUtil.getDateAndTime(currentDate);
+		DateTime txnCreatedDateDateTime = JDateUtil
+				.getDateAndTime(txnCreatedDate);
+		DateTime settlementnDateTime = JDateUtil.getDateAndTime(
+				dailySettlementHr, dailySettlementMin);
+
+		// If execution time is more than scheduled time
+		if (txnCreatedDateDateTime.compareTo(settlementnDateTime) > 0) {
+			return Boolean.FALSE;
+		}
+
+		// Is previous day transaction
+
+		Interval lastDay = JDateUtil.getISTPreviousDay();
+		if ((currentDateTime.compareTo(settlementnDateTime) <= 0
+				&& txnCreatedDateDateTime.compareTo(lastDay.getStart()) >= 0 && txnCreatedDateDateTime
+				.compareTo(lastDay.getEnd()) <= 0)
+				|| (txnCreatedDateDateTime.compareTo(lastDay.getEnd()) >= 0 && txnCreatedDateDateTime
+						.compareTo(settlementnDateTime) <= 0)) {
+			return Boolean.FALSE;
+		}
+
+		return Boolean.TRUE;
+
+	}
+
 
 }

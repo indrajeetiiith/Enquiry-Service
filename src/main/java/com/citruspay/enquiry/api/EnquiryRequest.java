@@ -2,6 +2,9 @@ package com.citruspay.enquiry.api;
 
 public class EnquiryRequest {
 	private String merchantTxnId;
+	private String merchantAccessKey;
+	private String merchantRefundTxId;
+
 	public String getMerchantTxnId() {
 		return merchantTxnId;
 	}
@@ -14,6 +17,11 @@ public class EnquiryRequest {
 	public void setMerchantAccessKey(String merchantAccessKey) {
 		this.merchantAccessKey = merchantAccessKey;
 	}
-	private String merchantAccessKey;
+	public String getMerchantRefundTxId() {
+		return merchantRefundTxId;
+	}
+	public void setMerchantRefundTxId(String merchantRefundTxId) {
+		this.merchantRefundTxId = merchantRefundTxId;
+	}
 }
 

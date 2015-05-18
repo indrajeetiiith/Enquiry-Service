@@ -27,7 +27,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 			
 			entityManager = PersistenceManager.INSTANCE.getEntityManager();
 			
-			System.out.println(" in function getLastTxnByMtxAndMerchant merchanttxnid:"+merchantTxId+"merchant="+merchant);
+			System.out.println("\n in function getLastTxnByMtxAndMerchant merchanttxnid:"+merchantTxId+"merchant="+merchant);
 			
 			TypedQuery<Transaction> query = entityManager
 					.createQuery(
@@ -61,5 +61,32 @@ public class TransactionDAOImpl implements TransactionDAO {
 		query.setParameter(2, merchant.getId());
 		return query.getResultList();
 	}
+	public Transaction getRefundTxnByMtxAndMerchantAndId(String merchantTxId,
+			String merchantRefundTxId, Merchant merchant) {
+		try {
+			EntityManager entityManager = null;
+			
+			entityManager = PersistenceManager.INSTANCE.getEntityManager();
+
+			TypedQuery<Transaction> query = entityManager
+					.createQuery(
+							"SELECT txn from Transaction txn WHERE txn.merchantTxId = ?1 and txn.merchant.id = ?2 and txn.merchantRefundTxId = ?3 ORDER BY txn.lastModified desc",
+							Transaction.class);
+			query.setParameter(1, merchantTxId);
+			query.setParameter(2, merchant.getId());
+			query.setParameter(3, merchantRefundTxId);
+
+			if (CommonUtil.isNotNull(query.getResultList())
+					&& CommonUtil.isNotNull(query.getResultList().get(0))) {
+				return query.getResultList().get(0);
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+
 
 }

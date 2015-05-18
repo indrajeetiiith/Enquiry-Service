@@ -1,4 +1,6 @@
 package com.citruspay.enquiry.api;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,30 +18,14 @@ public class EnquiryTransactionBase {
 
 	public EnquiryResponse enquiry(EnquiryRequest enquiryRequest)
 	{
-<<<<<<< HEAD
 		System.out.println("entering function enquiry request="+enquiryRequest);
 		LOGGER.info("Enquiry API : Mandatory request parameter missing for enquiry id: merchantAccessKey="+enquiryRequest.getMerchantAccessKey() + " transactionId"+enquiryRequest.getMerchantTxnId());
 
-=======
-<<<<<<< HEAD
-		System.out.println("entering function enquiry request="+enquiryRequest);
-		LOGGER.info("Enquiry API : Mandatory request parameter missing for enquiry id: merchantAccessKey="+enquiryRequest.getMerchantAccessKey() + " transactionId"+enquiryRequest.getMerchantTxnId());
-
-=======
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 		EnquiryResponse enquiryResponse = new EnquiryResponse();
 		try {
 			// Validate request parameters
 			String merchantAccessKey = enquiryRequest.getMerchantAccessKey();
 			String transactionId =  enquiryRequest.getMerchantTxnId();
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-			LOGGER.info("Enquiry API : Mandatory request parameter missing for enquiry id: merchantAccessKey="+merchantAccessKey + " transactionId"+transactionId);
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 
 			if (!validateRequest(merchantAccessKey, transactionId)) {
 				LOGGER.error("Enquiry API : Mandatory request parameter missing for enquiry id: "
@@ -49,16 +35,8 @@ public class EnquiryTransactionBase {
 			// Find merchant
 			Merchant merchant = new MerchantDAOImpl()
 					.findBySecretId(merchantAccessKey);
-<<<<<<< HEAD
 			System.out.println("merchant="+merchant);
 
-=======
-<<<<<<< HEAD
-			System.out.println("merchant="+merchant);
-
-=======
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 			if (merchant == null) {
 				LOGGER.error("Enquiry API : Merchant not found for enquiry request id:"
 						+ transactionId);
@@ -66,19 +44,35 @@ public class EnquiryTransactionBase {
 			LOGGER.debug("Enquiry API : Txn Enquiry request received for :"
 					+ merchant.getName() + ":id=" + transactionId);
 			// Get last modified transaction's pg for enquiry call
-			Transaction txn =new TransactionDAOImpl().getLastTxnByMtxAndMerchant(
-					transactionId, merchant);
-
-			// Validate transaction
-			if (CommonUtil.isNull(txn)) {
+			List<Transaction> transactions = null;
+			transactions =new TransactionDAOImpl().findByMerchantTxnId(transactionId, merchant);
+			if (CommonUtil.isNull(transactions)) {
 				LOGGER.error("Enquiry API : Txn not found for given txn id in citrus system:"
 						+ merchant.getName() + ":" + transactionId);
 			}
-			System.out.println("-----transaction = "+txn.getLastModified());
-//			System.out.println("-----transaction = "+txn+" tx.getCreated()="+txn.getCreated()+"tx.getTransactionType().name()="+txn.getTransactionType().name()+"tx.getMerchantRefundTxId()=");/*+txn.getMerchantRefundTxId()+"tx.getPgTxResp()="
-//					+txn.getPgTxResp().getAuthIdCode()+ "txn.getPgTxResp().getAuthIdCode()="+txn.getPgTxResp().getIssuerRefNo());*/
+			if(transactions != null)
+			{
+				System.out.println( "\n"+transactions.size() + " found\n");
+			}
+
+			// Validate transaction
+					for(Transaction txn: transactions)
+					{
+						System.out.print("-----transaction = "+txn+ " txn id="+txn.getTxId()+" amount="+txn.getOrderAmount().getAmount().toString()+" lastmodified = "+txn.getLastModified()+ " txn.getTxngateway="+txn.getTxnGateway());
+						if (txn.getPgTxResp()!= null) {
+							
+							System.out.println(" gateway = "+txn.getTxnGateway() + " pgtxnid = "+txn.getPgTxResp().getPgTxnId() + " authidcode="+txn.getPgTxResp().getAuthIdCode()+
+									" issuer ref no="+txn.getPgTxResp().getIssuerRefNo());
+						}
+						else
+							
+						System.out.println();
+
+						//			System.out.println("-----transaction = "+txn+" tx.getCreated()="+txn.getCreated()+"tx.getTransactionType().name()="+txn.getTransactionType().name()+"tx.getMerchantRefundTxId()=");/*+txn.getMerchantRefundTxId()+"tx.getPgTxResp()="
+						//					+txn.getPgTxResp().getAuthIdCode()+ "txn.getPgTxResp().getAuthIdCode()="+txn.getPgTxResp().getIssuerRefNo());*/
 
 
+					}
 
 
 		} catch (Exception ex) {
@@ -86,16 +80,8 @@ public class EnquiryTransactionBase {
 					"Enquiry API : Exception during enquiry API call due to : "
 							+ ex.getMessage(), ex);
 		}
-<<<<<<< HEAD
-		System.out.println("exiting function enquriy line 49");
+		System.out.println("exiting function enquiry");
 
-=======
-<<<<<<< HEAD
-		System.out.println("exiting function enquriy line 49");
-
-=======
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 		return enquiryResponse;
 	}
 	public boolean validateRequest(String merchantAccessKey, String transactionId)

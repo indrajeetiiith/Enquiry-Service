@@ -61,13 +61,64 @@ public class Transaction implements Serializable {
 	@Size(min = 1)
 	private String merchantTxId;
 
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private PGTransaction pgTxResp;
+
 	
-	
+	public PGTransaction getPgTxResp() {
+		return pgTxResp;
+	}
+	public void setPgTxResp(PGTransaction pgTxResp) {
+		this.pgTxResp = pgTxResp;
+	}
 	@Temporal(TemporalType.TIMESTAMP)
 	@Version
 	private Date lastModified;
 
+	@Embedded
+	@NotNull
+	@Valid
+	private Amount orderAmount;
 	
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date created;
+
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(id).append(",");
+		sb.append(txId).append(",");
+		sb.append(merchantTxId).append(",");
+		sb.append(orderAmount).append(",");
+		if (pgTxResp != null) {
+			sb.append(pgTxResp).append(",");
+		}
+		if (merchant != null) {
+			sb.append(merchant.getId()).append(",");
+		}
+		return sb.toString();
+	}
+
+
+	public Transaction() {
+	}
+
+	public Transaction(Merchant merchant,
+			String txId, Amount orderAmount) {
+		super();
+
+		this.merchant = merchant;
+		this.merchantTxId = txId;
+		this.orderAmount = orderAmount;
+		this.created = new Date();
+	}
+
+	
+	public Amount getOrderAmount() {
+		return orderAmount;
+	}
+	public void setOrderAmount(Amount orderAmount) {
+		this.orderAmount = orderAmount;
+	}
 	public Date getLastModified() {
 		return lastModified;
 	}
@@ -75,6 +126,14 @@ public class Transaction implements Serializable {
 		this.lastModified = lastModified;
 	}
 	private String txId;
+	private String txnGateway;
+
+	public String getTxnGateway() {
+		return txnGateway;
+	}
+	public void setTxnGateway(String txnGateway) {
+		this.txnGateway = txnGateway;
+	}
 	public Long getId() {
 		return id;
 	}

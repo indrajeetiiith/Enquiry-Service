@@ -1,6 +1,8 @@
 package com.citruspay.enquiry.persistence.implementation;
 
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
@@ -44,5 +46,20 @@ public class TransactionDAOImpl implements TransactionDAO {
 			return null;
 		}
 	}
-	
+
+	public List<Transaction> findByMerchantTxnId(String merTxnId,
+			Merchant merchant) {
+		EntityManager entityManager = null;
+		
+		entityManager = PersistenceManager.INSTANCE.getEntityManager();
+
+		TypedQuery<Transaction> query = entityManager
+				.createQuery(
+						"SELECT txn from Transaction txn WHERE txn.merchantTxId = ?1 and txn.merchant.id = ?2",
+						Transaction.class);
+		query.setParameter(1, merTxnId);
+		query.setParameter(2, merchant.getId());
+		return query.getResultList();
+	}
+
 }

@@ -34,13 +34,6 @@ import org.hibernate.envers.NotAudited;
 
 
 @Entity
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 @Table(name = "MER_MERCHANT")
 public class Merchant implements Serializable {
 
@@ -66,10 +59,6 @@ public class Merchant implements Serializable {
 	private String merchantUrlPart;
 
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
@@ -78,11 +67,6 @@ public class Merchant implements Serializable {
 	@JsonIgnore
 	private Date lastModified;
 
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 	@OneToMany(mappedBy = "merchant", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@NotAudited
@@ -102,24 +86,6 @@ public class Merchant implements Serializable {
 	private String blockMailers;
 
 	private String perfTemplate = "checkout_nitro";
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-	/*
-	 * @OneToOne
-	 * 
-	 * @JoinColumn(name="amex_cat_code_id") private AmexCategoryCode
-	 * amexCategoryCode;
-	 */
-//	TODO: PPD DEPENDENCY REMOVAL
-//	@JsonIgnore
-//	@OneToMany(mappedBy = "merchantPrepaidSchemePk.merchant")
-//	@LazyCollection(LazyCollectionOption.TRUE)
-//	@NotAudited
-//	private List<PrepaidSemiclosedMerchants> prepaidSemiclosedMerchants;
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 	
 	public String getPerfTemplate() {
 		return perfTemplate;
@@ -149,13 +115,6 @@ public class Merchant implements Serializable {
 	
 	private boolean nitroIframe;
 	
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-	private boolean nitroIframeMobile;
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 
 	public Merchant() {
 	}
@@ -165,14 +124,7 @@ public class Merchant implements Serializable {
 		this.name = name;
 		this.siteUrl = siteUrl;
 		this.vanityUrlPart = vanityUrlPart;
-<<<<<<< HEAD
 		this.created = new Date();
-=======
-<<<<<<< HEAD
-		this.created = new Date();
-=======
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 	}
 
 	public Integer getId() {
@@ -209,10 +161,6 @@ public class Merchant implements Serializable {
 	}
 
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 	public void setCreated(Date created) {
 		this.created = created;
 	}
@@ -229,11 +177,6 @@ public class Merchant implements Serializable {
 		this.lastModified = lastModified;
 	}
 
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 	@Override
 	public String toString() {
 		return "Merchant [id=" + id + ", name=" + name + ", siteUrl=" + siteUrl
@@ -305,19 +248,6 @@ public class Merchant implements Serializable {
 		this.autoDetectDevice = autoDetectDevice;
 	}
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-	/*
-	 * public AmexCategoryCode getAmexCategoryCode() { return amexCategoryCode;
-	 * }
-	 * 
-	 * public void setAmexCategoryCode(AmexCategoryCode amexCategoryCode) {
-	 * this.amexCategoryCode = amexCategoryCode; }
-	 */
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 
 	public String getPanCard() {
 		return panCard;
@@ -335,14 +265,7 @@ public class Merchant implements Serializable {
 		this.panCardValidated = panCardValidated;
 	}
 
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD
-
-=======
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 	public String getNotifyUrl() {
 		return notifyUrl;
 	}
@@ -373,10 +296,6 @@ public class Merchant implements Serializable {
 		this.nitroForMerchant = nitroForMerchant;
 	}
 	
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 	// TODO - Need to get value from DB
 	// currently check only with RechangeItnow
 	public boolean isNitroForMerchant() {
@@ -391,11 +310,6 @@ public class Merchant implements Serializable {
 	public boolean getNitro() {
 		return nitro;
 	}
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 
 	public boolean isCookieBased() {
 		return cookieBased;
@@ -438,19 +352,5 @@ public class Merchant implements Serializable {
 		this.nitroIframe = nitroIframe;
 	}
 
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD
-
-=======
-	public boolean isNitroIframeMobile() {
-		return nitroIframeMobile;
-	}
-
-	public void setNitroIframeMobile(boolean nitroIframeMobile) {
-		this.nitroIframeMobile = nitroIframeMobile;
-	}
->>>>>>> 63cbfe1fb644b0ed860a22788730461b6a199082
->>>>>>> b856f04f9362059bd510fec0f3a9b4a984435d96
 }

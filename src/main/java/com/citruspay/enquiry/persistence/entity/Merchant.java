@@ -17,7 +17,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Transient;
@@ -32,11 +31,16 @@ import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
+import com.citruspay.enquiry.persistence.entity.Address;
+import com.citruspay.enquiry.persistence.entity.Merchant;
+import com.citruspay.enquiry.persistence.entity.MerchantKey;
+
+
 
 @Entity
+@Audited
 @Table(name = "MER_MERCHANT")
 public class Merchant implements Serializable {
-
 	/**
 	 * 
 	 */
@@ -57,6 +61,9 @@ public class Merchant implements Serializable {
 	private String vanityUrlPart;
 
 	private String merchantUrlPart;
+
+	@Embedded
+	private Address address;
 
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -86,6 +93,18 @@ public class Merchant implements Serializable {
 	private String blockMailers;
 
 	private String perfTemplate = "checkout_nitro";
+	/*
+	 * @OneToOne
+	 * 
+	 * @JoinColumn(name="amex_cat_code_id") private AmexCategoryCode
+	 * amexCategoryCode;
+	 */
+//	TODO: PPD DEPENDENCY REMOVAL
+//	@JsonIgnore
+//	@OneToMany(mappedBy = "merchantPrepaidSchemePk.merchant")
+//	@LazyCollection(LazyCollectionOption.TRUE)
+//	@NotAudited
+//	private List<PrepaidSemiclosedMerchants> prepaidSemiclosedMerchants;
 	
 	public String getPerfTemplate() {
 		return perfTemplate;
@@ -105,6 +124,7 @@ public class Merchant implements Serializable {
 	private boolean nitroForMerchant;
 
 	
+	
 	private boolean cookieBased;
 	
 	private Integer dccEnabled;
@@ -115,6 +135,7 @@ public class Merchant implements Serializable {
 	
 	private boolean nitroIframe;
 	
+
 
 	public Merchant() {
 	}
@@ -151,6 +172,15 @@ public class Merchant implements Serializable {
 		this.siteUrl = siteUrl;
 	}
 
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+
+
 
 	public String getVanityUrlPart() {
 		return vanityUrlPart;
@@ -160,6 +190,11 @@ public class Merchant implements Serializable {
 		this.vanityUrlPart = vanityUrlPart;
 	}
 
+	/*
+	 * public SSLPage getSslPage() { return sslPage; }
+	 * 
+	 * public void setSslPage(SSLPage sslPage) { this.sslPage = sslPage; }
+	 */
 
 	public void setCreated(Date created) {
 		this.created = created;
@@ -248,6 +283,13 @@ public class Merchant implements Serializable {
 		this.autoDetectDevice = autoDetectDevice;
 	}
 
+	/*
+	 * public AmexCategoryCode getAmexCategoryCode() { return amexCategoryCode;
+	 * }
+	 * 
+	 * public void setAmexCategoryCode(AmexCategoryCode amexCategoryCode) {
+	 * this.amexCategoryCode = amexCategoryCode; }
+	 */
 
 	public String getPanCard() {
 		return panCard;
@@ -265,6 +307,16 @@ public class Merchant implements Serializable {
 		this.panCardValidated = panCardValidated;
 	}
 
+//	TODO: PPD DEPENDENCY REMOVAL
+//	@JsonIgnore
+//	public List<PrepaidSemiclosedMerchants> getPrepaidSemiclosedMerchants() {
+//		return this.prepaidSemiclosedMerchants;
+//	}
+//
+//	public void setPrepaidSemiclosedMerchants(
+//			List<PrepaidSemiclosedMerchants> prepaidSemiclosedMerchants) {
+//		this.prepaidSemiclosedMerchants = prepaidSemiclosedMerchants;
+//	}
 
 	public String getNotifyUrl() {
 		return notifyUrl;
@@ -300,6 +352,14 @@ public class Merchant implements Serializable {
 	// currently check only with RechangeItnow
 	public boolean isNitroForMerchant() {
 
+		/*
+		 * if(this.vanityUrlPart.equalsIgnoreCase("nagama") ||
+		 * this.vanityUrlPart.equalsIgnoreCase("b4a607regd") ||
+		 * this.vanityUrlPart.equalsIgnoreCase("testNitro") ||
+		 * this.vanityUrlPart.equalsIgnoreCase("abhinavTest") ){ return true; }
+		 * 
+		 * return false;
+		 */
 		return nitroForMerchant;
 	}
 	
@@ -351,6 +411,5 @@ public class Merchant implements Serializable {
 	public void setNitroIframe(boolean nitroIframe) {
 		this.nitroIframe = nitroIframe;
 	}
-
 
 }

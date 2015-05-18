@@ -13,17 +13,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
-import org.glassfish.jersey.client.ClientConfig;
 import org.json.JSONObject;
 
 public class EnquiryRestClient {
@@ -36,26 +28,11 @@ public class EnquiryRestClient {
 	 */
 	public static void main(String[] args) {
 
-//		ClientConfig config = new ClientConfig();
-
-//		Client client = ClientBuilder.newClient(config);
-
-//		WebTarget target = client.target(getBaseURI());
-//
-//		System.out.println("Output 1: " + target.path("rest").path("hello").path("tests").request().accept(MediaType.TEXT_PLAIN).get(Response.class).toString());
-//		System.out.println("Output 7: " + target.path("rest").path("todo").request().accept(MediaType.APPLICATION_JSON).get(String.class));
-
 		callFetchJson(URI_TEMPLATE);
 	}
-
-	private static URI getBaseURI() {
-		return UriBuilder.fromUri(URI_TEMPLATE).build();
-	}
-	
 	private static void callFetchJson(String urlCall) {
 		try {
 			 
-			//URL url = new URL(urlCall+"/rest/todo");
 			URL url = new URL(urlCall+"/service/enquiryService");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("POST");
@@ -70,16 +47,16 @@ public class EnquiryRestClient {
 			 * get the JSON file
 			 */
 	        // Step1: Let's 1st read file from fileSystem
-            InputStream crunchifyInputStream = new FileInputStream(
+            InputStream fileInputStream = new FileInputStream(
                     "D://JSONFile.txt");
-            InputStreamReader crunchifyReader = new InputStreamReader(crunchifyInputStream);
-            BufferedReader bufferReader = new BufferedReader(crunchifyReader);
+            InputStreamReader inputReader = new InputStreamReader(fileInputStream);
+            BufferedReader bufferReader = new BufferedReader(inputReader);
             String line;
             String string="";
             while ((line = bufferReader.readLine()) != null) {
                 string += line + "\n";
             }
- 
+            bufferReader.close();
             JSONObject jsonObject = new JSONObject(string);
             System.out.println(jsonObject);
 			out.write(jsonObject.toString());
@@ -93,7 +70,7 @@ public class EnquiryRestClient {
 				(conn.getInputStream())));
 	 
 			String output;
-			System.out.print("Output 8: ");
+			System.out.print("Enquiry Response: ");
 			while ((output = br.readLine()) != null) {
 				System.out.println(output);
 			}

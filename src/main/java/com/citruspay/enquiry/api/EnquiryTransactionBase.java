@@ -60,6 +60,8 @@ public class EnquiryTransactionBase {
 				handleValidationError(ERROR_CODE_404, MERCHANT_NOT_FOUND,enquiryResponse);
 				return enquiryResponse;
 			}
+			else
+				System.out.println( " merchant="+merchant);
 			LOGGER.debug("Enquiry API : Txn Enquiry request received for :"
 					+ merchant.getName() + ":id=" + transactionId);
 			// Get last modified transaction's pg for enquiry call

@@ -35,7 +35,6 @@ public class EnquiryTransactionBase {
 	public EnquiryResponse enquiry(EnquiryRequest enquiryRequest)
 	{
 		System.out.println("entering function enquiry request="+enquiryRequest);
-		LOGGER.info("Enquiry API : Mandatory request parameter missing for enquiry id: merchantAccessKey="+enquiryRequest.getMerchantAccessKey() + " transactionId"+enquiryRequest.getMerchantTxnId());
 
 		EnquiryResponse enquiryResponse = new EnquiryResponse();
 		try {

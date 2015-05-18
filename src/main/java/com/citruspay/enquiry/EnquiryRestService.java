@@ -19,10 +19,10 @@ import javax.ws.rs.core.Response;
 import com.citruspay.enquiry.api.EnquiryRequest;
 import com.citruspay.enquiry.api.EnquiryResponse;
  
-@Path("/")
+@Path("/enquiryService")
 public class EnquiryRestService {
     @POST
-    @Path("/enquiryService")
+//    @Path("/enquiryService")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public EnquiryResponse enquiry(EnquiryRequest enquiryRequest) {

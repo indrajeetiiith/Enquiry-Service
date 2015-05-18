@@ -10,19 +10,51 @@
 		</layout>
 	</appender>
 	<appender name="RFA" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="/var/citruspay/logs/dynamic-pricing/dynamic-pricing.log"/>
+		<param name="File" value="D://enquiry-service.txt"/>
 		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
 		<param name="Append" value="true"/>
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} [%t][%X{sessionId}] %-5p %c[line:%L] %x - %m%n" />
 		</layout>
 	</appender>
+	<property>
+	<param name="log4j.logger.org.hibernate" value="INFO" />
 	
+<param name="log4j.logger.org.hibernate.SQL" value="DEBUG" /> 
+<param name="log4j.logger.org.hibernate.type" value="TRACE" />
+<param name="log4j.logger.org.hibernate.hql.ast.AST" value="info" />
+<param name="log4j.logger.org.hibernate.tool.hbm2ddl" value="warn" />
+<param name="log4j.logger.org.hibernate.hql" value="debug" />
+<param name="log4j.logger.org.hibernate.cache" value="info" />
+<param name="log4j.logger.org.hibernate.jdbc" value="debug" />
+	</property>	
 	<!-- Application Loggers -->
 	<logger name="com.citruspay">	
 		<level value="info" />
 	</logger>
 	
+
+<logger name="jdbc.sqltiming" additivity ="false">             
+    <level value="info" />                
+</logger>  
+<logger name="jdbc.resultset" additivity ="false">              
+    <level value="error" />        
+</logger>  
+<logger name="jdbc.audit" additivity ="false">
+    <level value="error" />        
+</logger>   
+<logger name="jdbc.sqlonly" additivity ="false">              
+    <level value="error" />        
+</logger>   
+<logger name="jdbc.resultsettable" additivity ="false">           
+    <level value="error" />       
+</logger>           
+<logger name="jdbc.connection" additivity ="false">              
+    <level value="error" />        
+</logger>  
+<logger name="jdbc.resultsettable" additivity ="false">            
+    <level value="error" />        
+</logger>
 	
 	<!-- Root Logger -->
 	<root>

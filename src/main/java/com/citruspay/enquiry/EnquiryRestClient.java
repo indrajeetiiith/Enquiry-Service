@@ -6,8 +6,11 @@ package com.citruspay.enquiry;
 
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -21,6 +24,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.client.ClientConfig;
+import org.json.JSONObject;
 
 public class EnquiryRestClient {
 
@@ -55,8 +59,31 @@ public class EnquiryRestClient {
 			URL url = new URL(urlCall+"/service/enquiryService");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Accept", "application/json");
+			conn.setDoOutput(true);
+			conn.setRequestProperty("Content-Type", "application/json");
+			conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+			OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
 	 
+			
+			/**
+			 * get the JSON file
+			 */
+	        // Step1: Let's 1st read file from fileSystem
+            InputStream crunchifyInputStream = new FileInputStream(
+                    "D://JSONFile.txt");
+            InputStreamReader crunchifyReader = new InputStreamReader(crunchifyInputStream);
+            BufferedReader bufferReader = new BufferedReader(crunchifyReader);
+            String line;
+            String string="";
+            while ((line = bufferReader.readLine()) != null) {
+                string += line + "\n";
+            }
+ 
+            JSONObject jsonObject = new JSONObject(string);
+            System.out.println(jsonObject);
+			out.write(jsonObject.toString());
+            out.close();
 			if (conn.getResponseCode() != 200) {
 				throw new RuntimeException("Failed : HTTP error code : "
 						+ conn.getResponseCode());

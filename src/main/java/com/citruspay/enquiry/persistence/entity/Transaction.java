@@ -36,6 +36,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
+import com.citruspay.enquiry.persistence.entity.ConsumerDetail;
 import com.citruspay.enquiry.persistence.entity.PaymentDetail;
 import com.citruspay.enquiry.persistence.entity.Amount;
 import com.citruspay.enquiry.persistence.entity.Merchant;
@@ -54,6 +55,17 @@ public class Transaction implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@ManyToOne
+	private ConsumerDetail consumerDetail;
+
+	
+	public ConsumerDetail getConsumerDetail() {
+		return consumerDetail;
+	}
+	public void setConsumerDetail(ConsumerDetail consumerDetail) {
+		this.consumerDetail = consumerDetail;
+	}
 	@NotNull
 	@ManyToOne
 	private Merchant merchant;
@@ -152,14 +164,16 @@ public class Transaction implements Serializable {
 	public Transaction() {
 	}
 
-	public Transaction(Merchant merchant,
+	public Transaction(Merchant merchant,ConsumerDetail consumerDetail,
 			String txId, Amount orderAmount) {
 		super();
 
 		this.merchant = merchant;
+		this.consumerDetail = consumerDetail;
 		this.merchantTxId = txId;
 		this.orderAmount = orderAmount;
 		this.created = new Date();
+
 	}
 
 	

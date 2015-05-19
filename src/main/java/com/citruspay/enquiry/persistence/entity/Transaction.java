@@ -66,6 +66,7 @@ public class Transaction implements Serializable {
 	public void setConsumerDetail(ConsumerDetail consumerDetail) {
 		this.consumerDetail = consumerDetail;
 	}
+
 	@NotNull
 	@ManyToOne
 	private Merchant merchant;

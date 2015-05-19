@@ -80,7 +80,7 @@ public class EnquiryTransactionBase {
 
 				
 			}
-			System.out.print("-----transaction = "+txn+ " txn id="+txn.getTxId()+" amount="+txn.getOrderAmount().getAmount().toString()+" lastmodified = "+txn.getLastModified()+ " txn.getTxngateway="+txn.getTxnGateway());
+			System.out.print("-----transaction = "+txn+ " txn id="+txn.getTxId()+" amount="+txn.getOrderAmount().getAmount().toString()+" lastmodified = "+txn.getLastModified()+ " txn.getTxngateway="+txn.getTxnGateway()+"txn.getCreated()="+txn.getCreated()+ " txn.getPgId()="+txn.getPgId()+" status="+txn.getStatus());
 			/*if (txn.getPgTxResp()!= null) {
 				System.out.println(" gateway = "+txn.getTxnGateway() + " pgtxnid = "+txn.getPgTxResp().getPgTxnId() + " authidcode="+txn.getPgTxResp().getAuthIdCode()+
 						" issuer ref no="+txn.getPgTxResp().getIssuerRefNo());
@@ -103,6 +103,8 @@ public class EnquiryTransactionBase {
 			
 			PaymentGateway pg = (CommonUtil.isNotNull(txn.getPgId())) ? new PaymentGatewayDAOImpl()
 					.findById(txn.getPgId()) : null;
+					
+			System.out.println(" value="+inquiryRespFromCitrusDB(txn,"10", "30", pg));
 
 		
 
@@ -131,6 +133,7 @@ public class EnquiryTransactionBase {
 	public static boolean inquiryRespFromCitrusDB(Transaction txn,
 			String dailySettlementTime, String dailySettlementMin,
 			PaymentGateway pg) {
+		System.out.println(" in function inquiryRespFromCitrusDB line 136 pg="+pg);
 		
 		// display result from citrus DB if transaction status is ON_HOLD
 		if (txn.getPaymentDetails() != null
@@ -139,8 +142,11 @@ public class EnquiryTransactionBase {
 				&& TransactionStatus.ON_HOLD.equals(txn.getStatus())) {
 			return true;
 		}
-
 		PGTransaction pgTxn = txn.getPgTxResp();
+		System.out.println(" txn.getCreated()="+txn.getCreated()+ " pgTxn="+pgTxn+ " enquiry status="+pgTxn.getInquiryStatus());
+
+		 CommonUtil.validateDateTime(txn.getCreated(), dailySettlementTime,
+					dailySettlementMin);
 		if ((CommonUtil.isNotNull(pgTxn) && pgTxn.getInquiryStatus() == 1)
 				|| TransactionStatus.REVERSED.equals(txn.getStatus())) {
 			return true;
@@ -150,12 +156,16 @@ public class EnquiryTransactionBase {
 						|| txn.getStatus().equals(TransactionStatus.FORWARDED)
 						|| txn.getStatus().equals(TransactionStatus.SESSION_EXPIRED) 
 						|| txn.getStatus().equals(TransactionStatus.DEBIT_REQ_SENT))) {
+			System.out.println(" in function inquiryRespFromCitrusDB line 157");
+
 			return CommonUtil.validateDateTime(txn.getCreated(), dailySettlementTime,
 					dailySettlementMin);
 
 		} else if ((CommonUtil.isNotNull(pg) && PGCode.CITRUS_PG.toString()
 				.equals(pg.getCode()))
 				&& (txn.getStatus().equals(TransactionStatus.SUCCESS))) {
+			System.out.println(" in function inquiryRespFromCitrusDB line 165");
+
 			return CommonUtil.validateDateTime(txn.getCreated(), dailySettlementTime,
 					dailySettlementMin);
 		}

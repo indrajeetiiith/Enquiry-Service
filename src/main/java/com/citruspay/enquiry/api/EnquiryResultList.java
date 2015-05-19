@@ -17,17 +17,17 @@ public class EnquiryResultList {
 
 	public EnquiryResultList(List<EnquiryResult> enquiryResultResult) {
 		super();
-		this.enquiryResultResult = enquiryResultResult;
+		this.enquiryResultList = enquiryResultResult;
 	}
 
-	List<EnquiryResult> enquiryResultResult;
+	List<EnquiryResult> enquiryResultList;
 
-	public List<EnquiryResult> getEnquiryResultResult() {
-		return enquiryResultResult;
+	public List<EnquiryResult> getEnquiryResultList() {
+		return enquiryResultList;
 	}
 
-	public void setEnquiryResultResult(List<EnquiryResult> enquiryResultResult) {
-		this.enquiryResultResult = enquiryResultResult;
+	public void setEnquiryResultList(List<EnquiryResult> enquiryResultList) {
+		this.enquiryResultList = enquiryResultList;
 	}
 	
 	

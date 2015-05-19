@@ -1,5 +1,8 @@
 package com.citruspay.enquiry.api;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +84,7 @@ public class EnquiryTransactionBase {
 				
 			}
 			System.out.print("-----transaction = "+txn+ " txn id="+txn.getTxId()+" amount="+txn.getOrderAmount().getAmount().toString()+" lastmodified = "+txn.getLastModified()+ " txn.getTxngateway="+txn.getTxnGateway()+"txn.getCreated()="+txn.getCreated()+ " txn.getPgId()="+txn.getPgId()+" status="+txn.getStatus());
+			
 			/*if (txn.getPgTxResp()!= null) {
 				System.out.println(" gateway = "+txn.getTxnGateway() + " pgtxnid = "+txn.getPgTxResp().getPgTxnId() + " authidcode="+txn.getPgTxResp().getAuthIdCode()+
 						" issuer ref no="+txn.getPgTxResp().getIssuerRefNo());
@@ -105,6 +109,11 @@ public class EnquiryTransactionBase {
 					.findById(txn.getPgId()) : null;
 					
 			System.out.println(" value="+inquiryRespFromCitrusDB(txn,"10", "30", pg));
+			// fill the enquiry response with the data whatever we have for the time being 
+			
+			populdateEnquiryResponse(enquiryResponse,txn,pg,merchant);
+			
+			return enquiryResponse;
 
 		
 
@@ -118,6 +127,40 @@ public class EnquiryTransactionBase {
 
 		return enquiryResponse;
 	}
+	private void populdateEnquiryResponse(EnquiryResponse enquiryResponse,Transaction txn,PaymentGateway pg,Merchant merchant)
+	{
+		EnquiryResultList enquiryResultList = new EnquiryResultList();
+		List<EnquiryResult> enquiryResult = new ArrayList<EnquiryResult>();
+		EnquiryResult enquirySingleResult = new EnquiryResult();
+
+		//txn.getTxId()+"  "+txn.getOrderAmount().getAmount().toString()+txn.getLastModified()+txn.getTxnGateway()+txn.getCreated()+txn.getPgId()+txn.getStatus());
+
+		enquirySingleResult.setOriginalAmount(txn.getOrderAmount().getAmount().toString());
+		enquirySingleResult.setRespCode((TransactionStatus.SUCCESS_ON_VERIFICATION
+						.equals(txn.getStatus())) ? "0" : String.valueOf(txn
+						.getStatus().ordinal()));
+		enquirySingleResult.setTxnGateway(txn.getTxnGateway()); // setting PG value to display in the transaction history
+		enquirySingleResult.setPgTxnId(txn.getPgTxResp().getPgTxnId());
+		enquirySingleResult.setAuthIdCode(txn.getPgTxResp().getAuthIdCode());
+		enquirySingleResult.setRRN(txn.getPgTxResp().getIssuerRefNo());
+		
+		enquirySingleResult.setRespMsg(txn.getStatus().getDisplayMsg());
+		enquirySingleResult.setTxnId(txn.getTxId());
+		//enquirySingleResult.setTxnDateTime(DateUtil.getDateStringInIST(tx.getCreated()));
+		//enquirySingleResult.setTxnType(txn.getTransactionType().name());
+		//enquirySingleResult.setMerchantRefundTxId(txn.getMerchantRefundTxId());
+		// set MTX
+		enquirySingleResult.setMerchantTxnId(txn.getMerchantTxId());
+		
+		enquiryResult.add(enquirySingleResult);
+		enquiryResultList.setEnquiryResultList(enquiryResult);
+		enquiryResponse.setData(enquiryResultList);
+		enquiryResponse.setRespCode(RESP_CODE_SUCCESS);
+		enquiryResponse.setRespMsg(txn.getStatus().getDisplayMsg());
+
+				
+	}
+
 	public boolean IsValidRequest(String merchantAccessKey, String transactionId)
 	{
 		if(CommonUtil.isEmpty(merchantAccessKey) || CommonUtil.isEmpty(transactionId)){

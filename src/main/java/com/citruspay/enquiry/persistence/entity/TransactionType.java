@@ -1,23 +1,17 @@
-/*
- * Copyright (c) 2012 CitrusPay. All Rights Reserved.
- *
- * This software is the proprietary information of CitrusPay.
- * Use is subject to license terms.
- */
 package com.citruspay.enquiry.persistence.entity;
 
 public enum TransactionType {
-	PAYMENT("Payment"), SUBSCRIPTION("Subscription"), EMI("EMI"), DONATIONS(
-			"Donations");
+	SALE("Sale"), PREAUTH("Pre auth"), REFUND("Refund"), CHARGE_BACK(
+			"Charge back"), LOAD("Prepaid Load"), RELOAD("Prepaid Reload"), CAPTURE(
+			"Capture"), VOID("Reversed");
 
-	private String desc;
+	private String displayLabel;
 
-	TransactionType(String desc) {
-		this.desc = desc;
+	private TransactionType(String displayLabel) {
+		this.displayLabel = displayLabel;
 	}
 
-	public String getDesc() {
-		return desc;
+	public String getDisplayLabel() {
+		return this.displayLabel;
 	}
-
 }

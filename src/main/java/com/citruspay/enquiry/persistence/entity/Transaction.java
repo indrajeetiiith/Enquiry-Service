@@ -33,15 +33,14 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
+
+import com.citruspay.enquiry.persistence.entity.TransactionType;
 import com.citruspay.enquiry.persistence.entity.ConsumerDetail;
 import com.citruspay.enquiry.persistence.entity.PaymentDetail;
 import com.citruspay.enquiry.persistence.entity.Amount;
 import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.entity.TransactionStatus;
-import com.citruspay.enquiry.persistence.entity.TransactionType;
 
 @Entity
 @Table(name = "TXN_TRANSACTION")
@@ -92,6 +91,18 @@ public class Transaction implements Serializable {
 	private Date lastModified;
 	
 	private Integer pgId;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "txn_type")
+	private TransactionType transactionType;
+
+
+	public TransactionType getTransactionType() {
+		return transactionType;
+	}
+	public void setTransactionType(TransactionType transactionType) {
+		this.transactionType = transactionType;
+	}
 
 	@NotNull
 	private TransactionStatus status;
@@ -109,6 +120,7 @@ public class Transaction implements Serializable {
 	public void setPgId(Integer pgId) {
 		this.pgId = pgId;
 	}
+	
 	@Embedded
 	@NotNull
 	@Valid
@@ -117,6 +129,8 @@ public class Transaction implements Serializable {
 	@OneToOne
 	private PaymentDetail paymentDetails;
 
+	
+	
 	
 	public PaymentDetail getPaymentDetails() {
 		return paymentDetails;

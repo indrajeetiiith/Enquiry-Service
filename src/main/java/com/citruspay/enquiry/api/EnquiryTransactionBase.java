@@ -85,11 +85,8 @@ public class EnquiryTransactionBase {
 				
 			}
 			System.out.print("-----transaction = "+txn+ " txn id="+txn.getTxId()+" amount="+txn.getOrderAmount().getAmount().toString()+" lastmodified = "+txn.getLastModified()+ " txn.getTxngateway="+txn.getTxnGateway()+"txn.getCreated()="+txn.getCreated()+ " txn.getPgId()="+txn.getPgId()+" status="+txn.getStatus());
-			
-			/*if (txn.getPgTxResp()!= null) {
-				System.out.println(" gateway = "+txn.getTxnGateway() + " pgtxnid = "+txn.getPgTxResp().getPgTxnId() + " authidcode="+txn.getPgTxResp().getAuthIdCode()+
-						" issuer ref no="+txn.getPgTxResp().getIssuerRefNo());
-			}*/
+
+			// validate merchant refund txnid given in the request
 			if (!CommonUtil.isEmpty(merchantRefundTxId)) {
 				// Get last modified transaction's pg for enquiry call
 				Transaction refundTxn = new TransactionDAOImpl()
@@ -134,8 +131,6 @@ public class EnquiryTransactionBase {
 		List<EnquiryResult> enquiryResult = new ArrayList<EnquiryResult>();
 		EnquiryResult enquirySingleResult = new EnquiryResult();
 
-		//txn.getTxId()+"  "+txn.getOrderAmount().getAmount().toString()+txn.getLastModified()+txn.getTxnGateway()+txn.getCreated()+txn.getPgId()+txn.getStatus());
-
 		enquirySingleResult.setOriginalAmount(txn.getOrderAmount().getAmount().toString());
 		enquirySingleResult.setRespCode((TransactionStatus.SUCCESS_ON_VERIFICATION
 						.equals(txn.getStatus())) ? "0" : String.valueOf(txn
@@ -148,7 +143,7 @@ public class EnquiryTransactionBase {
 		enquirySingleResult.setRespMsg(txn.getStatus().getDisplayMsg());
 		enquirySingleResult.setTxnId(txn.getTxId());
 		enquirySingleResult.setTxnDateTime(CommonUtil.getDateStringInIST(txn.getCreated()));
-		//enquirySingleResult.setTxnType(txn.getTransactionType().name());
+		enquirySingleResult.setTxnType(txn.getTransactionType().name());
 		enquirySingleResult.setMerchantRefundTxId(txn.getMerchantRefundTxId());
 		enquirySingleResult.setMerchantTxnId(txn.getMerchantTxId());
 		

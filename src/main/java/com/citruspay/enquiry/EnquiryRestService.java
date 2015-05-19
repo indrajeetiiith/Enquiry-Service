@@ -20,6 +20,11 @@ public class EnquiryRestService {
     @Produces(MediaType.APPLICATION_JSON)
     public EnquiryResponse enquiry(EnquiryRequest enquiryRequest) {
     	System.out.println(" +++++++ HELLLO world +++++++++ request received "+enquiryRequest.getMerchantAccessKey()+":"+enquiryRequest.getMerchantTxnId());
-    	return new EnquiryTransactionBase().enquiry(enquiryRequest);
+    	try {
+    		return new EnquiryTransactionBase().enquiry(enquiryRequest);
+    	} catch(Exception e) {
+        	return  null;
+    	}
+
     }
 }

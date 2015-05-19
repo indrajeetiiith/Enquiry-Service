@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.citruspay.CommonUtil;
+import com.citruspay.enquiry.persistence.entity.TransactionType;
 import com.citruspay.enquiry.persistence.PersistenceManager;
 import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.entity.Transaction;
@@ -19,6 +20,25 @@ public class TransactionDAOImpl implements TransactionDAO {
 
 	private static final Logger log = LoggerFactory.getLogger(TransactionDAOImpl.class);
 	
+
+	
+	
+	public List<Transaction> findByMerchantTxnIdAndMerchantRefundTxId(
+			String merTxnId, String merRefundTxId, Merchant merchant) {
+		EntityManager entityManager = null;
+		
+		entityManager = PersistenceManager.INSTANCE.getEntityManager();
+
+		TypedQuery<Transaction> query = entityManager
+				.createQuery(
+						"SELECT txn from Transaction txn WHERE txn.merchant.id = ?1 and txn.merchantTxId = ?2 and ( txn.transactionType <> ?4 or (txn.transactionType = ?4 and txn.merchantRefundTxId = ?3) ) ",
+						Transaction.class);
+		query.setParameter(1, merchant.getId());
+		query.setParameter(2, merTxnId);
+		query.setParameter(3, merRefundTxId);
+		query.setParameter(4, TransactionType.REFUND);
+		return query.getResultList();
+	}
 
 	public Transaction getLastTxnByMtxAndMerchant(String merchantTxId,
 			Merchant merchant) {
@@ -61,6 +81,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 		query.setParameter(2, merchant.getId());
 		return query.getResultList();
 	}
+	
 	public Transaction getRefundTxnByMtxAndMerchantAndId(String merchantTxId,
 			String merchantRefundTxId, Merchant merchant) {
 		try {

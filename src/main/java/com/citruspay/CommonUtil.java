@@ -26,6 +26,8 @@ public class CommonUtil {
 	public static final String CARDS_SUPPORTED_BY_MERCHANT = "supported";
 	public static final String CARDS_NOT_SUPPORTED_BY_MERCHANT = "unsupported";
 	public final static String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final int ONE = 1;
+
 
 	public static boolean isEmpty(String str) {
 		if (str == null || str.length() <= 0) {

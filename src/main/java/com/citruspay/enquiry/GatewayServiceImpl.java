@@ -48,16 +48,7 @@ public class GatewayServiceImpl {
 								.getPaymentDetails();
 						bean.setIssuerCode(paymntDetails.getBank().getCode());
 
-/* TODO later					} else if (txn.getPaymentDetails() instanceof PrepaidPaymentDetail) {
-						PrepaidPaymentDetail paymntDetails = (PrepaidPaymentDetail) txn
-								.getPaymentDetails();
-
-						ConsumerPaymentDetail conPaymntDetails = PaymentUtil
-								.getPaymentDetailsForResponse(paymntDetails);
-
-						bean.setMaskedCardNumber(conPaymntDetails
-								.getMaskedCardNumber());
-*/					} else if (txn.getPaymentDetails() instanceof ImpsPaymentDetail) {
+					} else if (txn.getPaymentDetails() instanceof ImpsPaymentDetail) {
 						ImpsPaymentDetail paymntDetails = (ImpsPaymentDetail) txn
 								.getPaymentDetails();
 
@@ -67,12 +58,7 @@ public class GatewayServiceImpl {
 						bean.setImpsMmid(conPaymntDetails.getMmid());
 						bean.setImpsMobileNumber(conPaymntDetails
 								.getMobileNumber());
-/*TODO					} else if (txn.getPaymentDetails() instanceof ATMCardPaymentDetails) {
-						ATMCardPaymentDetails atmCardDetails = (ATMCardPaymentDetails) txn
-								.getPaymentDetails();
-						
-						bean.setCardType(atmCardDetails.getCardType());
-*/					}
+					}
 					bean.setPaymentMode(txn.getPaymentDetails()
 							.getPaymentMode().toString());
 				}
@@ -84,12 +70,56 @@ public class GatewayServiceImpl {
 		bean.setCurrency(txn.getOrderAmount().getCurrency());
 
 		// update Pricing Transaction History if present
-		//TODO later updatePricingTransactionHistory(txn, bean);
+		updatePricingTransactionHistory(txn, bean);
 		
 		addAddressDetails(bean, txn);
 
 		return bean;
 	}
+	public void updatePricingTransactionHistory(Transaction txn,
+			EnquiryResult bean) {
+		if (CommonUtil.isNotNull(txn)
+				&& CommonUtil.isNotNull(txn.getPricingTransactionHistory())) {
+			bean.setOriginalAmount(CommonUtil.isNotNull(txn
+					.getPricingTransactionHistory().getOriginalAmount()) ? txn
+					.getPricingTransactionHistory().getOriginalAmount()
+					.toString() : null);
+			bean.setAdjustment(CommonUtil.isNotNull(txn
+					.getPricingTransactionHistory().getAdjustment()) ? txn
+					.getPricingTransactionHistory().getAdjustment().toString()
+					: null);
+			String ruleName = null;
+			String couponCode = null;
+			String ruleType = null;
+			boolean isCitrusSponsored = Boolean.FALSE;
+			if (CommonUtil.isNotNull(txn.getPricingTransactionHistory()
+					.getPricingRule())) {
+				ruleName = txn.getPricingTransactionHistory().getPricingRule()
+						.getName();
+				couponCode = txn.getPricingTransactionHistory().getPricingRule().getIsCoupon() == 1 ? ruleName : "";
+				ruleType = txn.getPricingTransactionHistory().getPricingRule()
+						.getOfferType().getDisplayLabel();
+				if (CommonUtil.ONE == txn.getPricingTransactionHistory()
+						.getPricingRule().getIsCitrusSponsored()) {
+					isCitrusSponsored = Boolean.TRUE;
+				}
+			}
+			bean.setRuleName(ruleName);
+			//currently the rule name and the coupon code are one and the same
+			bean.setCouponCode(couponCode);
+			bean.setOfferType(ruleType);
+
+			bean.setTransactionAmount((CommonUtil.isNotNull(txn
+					.getPricingTransactionHistory().getTxnAmount())) ? txn
+					.getPricingTransactionHistory().getTxnAmount().toString()
+					: null);
+			bean.setAmount(isCitrusSponsored ? txn
+					.getPricingTransactionHistory().getOriginalAmount()
+					.toString() : bean.getAmount());
+		}
+	}
+
+
 
 	private void addAddressDetails(EnquiryResult bean,
 			Transaction transaction) {

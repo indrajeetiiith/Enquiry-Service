@@ -35,6 +35,8 @@ import javax.validation.constraints.Size;
 
 
 
+
+import com.citruspay.enquiry.persistence.entity.PricingTransactionHistory;
 import com.citruspay.enquiry.persistence.entity.TransactionType;
 import com.citruspay.enquiry.persistence.entity.ConsumerDetail;
 import com.citruspay.enquiry.persistence.entity.PaymentDetail;
@@ -102,6 +104,19 @@ public class Transaction implements Serializable {
 	}
 	public void setTransactionType(TransactionType transactionType) {
 		this.transactionType = transactionType;
+	}
+
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "pricing_transaction_history", nullable = true)
+	private PricingTransactionHistory pricingTransactionHistory;
+
+	
+	public PricingTransactionHistory getPricingTransactionHistory() {
+		return pricingTransactionHistory;
+	}
+	public void setPricingTransactionHistory(
+			PricingTransactionHistory pricingTransactionHistory) {
+		this.pricingTransactionHistory = pricingTransactionHistory;
 	}
 
 	@NotNull

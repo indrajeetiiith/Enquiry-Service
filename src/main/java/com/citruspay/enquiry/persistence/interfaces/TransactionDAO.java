@@ -13,6 +13,6 @@ public interface TransactionDAO {
 			Merchant merchant);
 	public List<Transaction> findByMerchantTxnId(String merTxnId,
 			Merchant merchant);
-
-	
+	public List<Transaction> findByMerchantTxnIdAndMerchantRefundTxId(
+			String merTxnId, String merRefundTxId, Merchant merchant);
 	}

@@ -161,7 +161,15 @@ public class Transaction implements Serializable {
 		return sb.toString();
 	}
 
+	private String merchantRefundTxId;
 
+	
+	public String getMerchantRefundTxId() {
+		return merchantRefundTxId;
+	}
+	public void setMerchantRefundTxId(String merchantRefundTxId) {
+		this.merchantRefundTxId = merchantRefundTxId;
+	}
 	public Transaction() {
 	}
 

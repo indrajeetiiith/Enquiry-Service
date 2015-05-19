@@ -6,9 +6,12 @@
  */
 package com.citruspay;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -22,6 +25,7 @@ public class CommonUtil {
 	public static final int EIGHT_DECIMAL_PLACES = 8;
 	public static final String CARDS_SUPPORTED_BY_MERCHANT = "supported";
 	public static final String CARDS_NOT_SUPPORTED_BY_MERCHANT = "unsupported";
+	public final static String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	public static boolean isEmpty(String str) {
 		if (str == null || str.length() <= 0) {
@@ -108,6 +112,17 @@ public class CommonUtil {
 		return Boolean.TRUE;
 
 	}
+
+	public static String getDateStringInIST(Date date) {
+
+		Calendar calendar = Calendar.getInstance();
+		TimeZone timeZone = TimeZone.getTimeZone("GMT+05:30");
+		calendar.setTime(date);
+		SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);
+		sdf.setTimeZone(timeZone);
+		return sdf.format(calendar.getTime());
+	}
+
 
 
 }

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.citruspay.CommonUtil;
+import com.citruspay.enquiry.GatewayServiceImpl;
 import com.citruspay.enquiry.persistence.entity.PGTransaction;
 import com.citruspay.enquiry.type.GatewayType;
 import com.citruspay.enquiry.type.PGCode;
@@ -146,18 +147,19 @@ public class EnquiryTransactionBase {
 		
 		enquirySingleResult.setRespMsg(txn.getStatus().getDisplayMsg());
 		enquirySingleResult.setTxnId(txn.getTxId());
-		//enquirySingleResult.setTxnDateTime(DateUtil.getDateStringInIST(tx.getCreated()));
+		enquirySingleResult.setTxnDateTime(CommonUtil.getDateStringInIST(txn.getCreated()));
 		//enquirySingleResult.setTxnType(txn.getTransactionType().name());
-		//enquirySingleResult.setMerchantRefundTxId(txn.getMerchantRefundTxId());
-		// set MTX
+		enquirySingleResult.setMerchantRefundTxId(txn.getMerchantRefundTxId());
 		enquirySingleResult.setMerchantTxnId(txn.getMerchantTxId());
 		
+		new GatewayServiceImpl().updatePaymentDetailAndAddressDetail(txn,enquirySingleResult,pg);
 		enquiryResult.add(enquirySingleResult);
 		enquiryResultList.setEnquiryResultList(enquiryResult);
 		enquiryResponse.setData(enquiryResultList);
 		enquiryResponse.setRespCode(RESP_CODE_SUCCESS);
 		enquiryResponse.setRespMsg(txn.getStatus().getDisplayMsg());
 
+		
 				
 	}
 

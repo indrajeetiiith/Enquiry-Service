@@ -20,6 +20,8 @@ public class CommonUtil {
 
 	public static final int DECIMAL_PLACES = 2;
 	public static final int EIGHT_DECIMAL_PLACES = 8;
+	public static final String CARDS_SUPPORTED_BY_MERCHANT = "supported";
+	public static final String CARDS_NOT_SUPPORTED_BY_MERCHANT = "unsupported";
 
 	public static boolean isEmpty(String str) {
 		if (str == null || str.length() <= 0) {
@@ -81,21 +83,27 @@ public class CommonUtil {
 		DateTime settlementnDateTime = JDateUtil.getDateAndTime(
 				dailySettlementHr, dailySettlementMin);
 
+		System.out.println(" txnCreatedDateDateTime="+txnCreatedDateDateTime + " settlementnDateTime="+settlementnDateTime);
 		// If execution time is more than scheduled time
 		if (txnCreatedDateDateTime.compareTo(settlementnDateTime) > 0) {
+			System.out.println(" line 87 txnCreatedDateDateTime="+txnCreatedDateDateTime + " settlementnDateTime="+settlementnDateTime);
+
 			return Boolean.FALSE;
 		}
 
 		// Is previous day transaction
 
 		Interval lastDay = JDateUtil.getISTPreviousDay();
+		System.out.println( " currentDateTime="+currentDateTime+"lastday="+lastDay+ " lastDay.getStart()="+lastDay.getStart()+" lastDay.getEnd()="+lastDay.getEnd());
 		if ((currentDateTime.compareTo(settlementnDateTime) <= 0
 				&& txnCreatedDateDateTime.compareTo(lastDay.getStart()) >= 0 && txnCreatedDateDateTime
 				.compareTo(lastDay.getEnd()) <= 0)
 				|| (txnCreatedDateDateTime.compareTo(lastDay.getEnd()) >= 0 && txnCreatedDateDateTime
 						.compareTo(settlementnDateTime) <= 0)) {
+			System.out.println(" lline 98");
 			return Boolean.FALSE;
 		}
+		System.out.println(" line 103 currentDateTime="+currentDateTime+"txnCreatedDateDateTime="+txnCreatedDateDateTime + " settlementnDateTime="+settlementnDateTime+ " currentDateTime.compareTo(settlementnDateTime)="+currentDateTime.compareTo(settlementnDateTime));
 
 		return Boolean.TRUE;
 

@@ -48,7 +48,10 @@ public class JDateUtil {
 		date.setMinutes((dailySettlementMin.length() < 2) ? Integer.valueOf("0"
 				+ dailySettlementMin) : Integer.valueOf(dailySettlementMin));
 		DateTimeZone ISTTimeZone = DateTimeZone.forID(UTC);
+		System.out.println( " isttimezone="+ISTTimeZone);
 		DateTime dateTime = new DateTime(date.getTime(), ISTTimeZone);
+		System.out.println( " dateTime="+dateTime + "date="+date + "date.getTime()="+date.getTime());
+		
 		return dateTime;
 	}
 

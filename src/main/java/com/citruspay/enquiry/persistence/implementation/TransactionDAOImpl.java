@@ -10,10 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.citruspay.CommonUtil;
-import com.citruspay.enquiry.persistence.entity.TransactionType;
 import com.citruspay.enquiry.persistence.PersistenceManager;
 import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.entity.Transaction;
+import com.citruspay.enquiry.persistence.entity.TransactionType;
 import com.citruspay.enquiry.persistence.interfaces.TransactionDAO;
 
 public class TransactionDAOImpl implements TransactionDAO {

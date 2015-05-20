@@ -1,9 +1,4 @@
-
-
 package com.citruspay.enquiry;
-
-
-
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -15,17 +10,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
 import org.json.JSONObject;
 
 public class EnquiryRestClient {
 
 	//private static String URI_TEMPLATE = "http://localhost:8080/EnquiryService/service/enquiryService";
 	private static String URI_TEMPLATE = "http://localhost:8080/EnquiryService";
-	/*
-	 * Use mvn tomcat:run to start the server
-	 * 
-	 */
+
 	public static void main(String[] args) {
 
 		callFetchJson(URI_TEMPLATE);

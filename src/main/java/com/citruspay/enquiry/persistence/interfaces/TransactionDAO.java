@@ -15,4 +15,7 @@ public interface TransactionDAO {
 			Merchant merchant);
 	public List<Transaction> findByMerchantTxnIdAndMerchantRefundTxId(
 			String merTxnId, String merRefundTxId, Merchant merchant);
+	public Transaction getRefundTxnByMtxAndMerchantAndId(String merchantTxId,
+			String merchantRefundTxId, Merchant merchant);
+
 	}

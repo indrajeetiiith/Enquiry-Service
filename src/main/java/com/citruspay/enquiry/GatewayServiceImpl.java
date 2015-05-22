@@ -1,21 +1,21 @@
 package com.citruspay.enquiry;
 
 
+import com.citruspay.CommonUtil;
+import com.citruspay.PaymentUtil;
+import com.citruspay.enquiry.api.EnquiryResult;
+import com.citruspay.enquiry.persistence.entity.Address;
 import com.citruspay.enquiry.persistence.entity.ConsumerPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.CreditCardPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.DebitCardPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.ImpsPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.NetBankingPaymentDetail;
-import com.citruspay.enquiry.persistence.entity.Transaction;
-import com.citruspay.CommonUtil;
-import com.citruspay.enquiry.api.EnquiryResult;
-import com.citruspay.enquiry.persistence.entity.Address;
-import com.citruspay.PaymentUtil;
-import com.citruspay.enquiry.persistence.entity.TransactionStatus;
 import com.citruspay.enquiry.persistence.entity.PaymentGateway;
+import com.citruspay.enquiry.persistence.entity.Transaction;
+import com.citruspay.enquiry.persistence.entity.TransactionStatus;
 public class GatewayServiceImpl {
 	
-	public EnquiryResult updatePaymentDetailAndAddressDetail(Transaction txn, EnquiryResult bean,PaymentGateway pg) {
+	public void updatePaymentDetailAndAddressDetail(Transaction txn, EnquiryResult bean,PaymentGateway pg) {
 
 		if (CommonUtil.isNotNull(txn) && isRequiredStatus(txn)) {
 			if (CommonUtil.isNotNull(txn.getTxnGateway())) {
@@ -74,7 +74,6 @@ public class GatewayServiceImpl {
 		
 		addAddressDetails(bean, txn);
 
-		return bean;
 	}
 	public void updatePricingTransactionHistory(Transaction txn,
 			EnquiryResult bean) {

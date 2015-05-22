@@ -16,6 +16,7 @@ import javax.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.citruspay.enquiry.persistence.PersistenceManager;
 import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.entity.MerchantKey;
 import com.citruspay.enquiry.persistence.interfaces.MerchantKeyDAO;
@@ -29,6 +30,9 @@ public class MerchantKeyDAOImpl implements MerchantKeyDAO {
 	private EntityManager em;
 
 	public List<MerchantKey> findMerchantKeys(Merchant merchant) {
+		
+		em = PersistenceManager.INSTANCE.getEntityManager();
+
 		TypedQuery<MerchantKey> query = em.createQuery(
 				"Select mk from MerchantKey mk where mk.merchant = ?1",
 				MerchantKey.class);
@@ -38,6 +42,8 @@ public class MerchantKeyDAOImpl implements MerchantKeyDAO {
 	}
 
 	public MerchantKey findById(Integer id) {
+		em = PersistenceManager.INSTANCE.getEntityManager();
+
 		if (id == null)
 			return null;
 		return em.find(MerchantKey.class, id);

@@ -7,7 +7,6 @@ import com.citruspay.enquiry.persistence.entity.ImpsPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.NetBankingPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.PaymentDetail;
 import com.citruspay.enquiry.persistence.entity.PaymentMode;
-import com.citruspay.CommonUtil;
 
 public class PaymentUtil {
 

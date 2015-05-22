@@ -27,8 +27,6 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.hibernate.envers.RelationTargetAuditMode;
 
-import com.citruspay.enquiry.persistence.entity.PGDownTime;
-
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "BNK_ISSUER")

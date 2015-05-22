@@ -37,7 +37,12 @@ public class JDateUtil {
 		DateTime dateTime = new DateTime(date.getTime(), ISTTimeZone);
 		return dateTime;
 	}
+	public static int noOfDays(DateTime start, DateTime end) {
+		return (int) ((startOfDay(end).getMillis() - startOfDay(start)
+				.getMillis()) / (1000 * 60 * 60 * 24));
+	}
 
+	
 	@SuppressWarnings("deprecation")
 	public static DateTime getDateAndTime(String dailySettlementHr,
 			String dailySettlementMin) {

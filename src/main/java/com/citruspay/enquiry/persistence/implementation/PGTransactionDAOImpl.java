@@ -1,11 +1,9 @@
 package com.citruspay.enquiry.persistence.implementation;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
-
-import com.citruspay.enquiry.persistence.entity.PGTransaction;
 import com.citruspay.enquiry.persistence.PersistenceManager;
+import com.citruspay.enquiry.persistence.entity.PGTransaction;
 import com.citruspay.enquiry.persistence.interfaces.PGTransactionDAO;
 
 public class PGTransactionDAOImpl implements PGTransactionDAO {

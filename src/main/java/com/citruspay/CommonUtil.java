@@ -6,6 +6,7 @@
  */
 package com.citruspay;
 
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -97,35 +98,36 @@ public class CommonUtil {
 	 * @param dailySettlementMin
 	 * @return
 	 */
-	public static boolean validateDateTime(Date txnCreatedDate,
-			String dailySettlementHr, String dailySettlementMin) {
+	public static boolean validateDateTime(Date txnCreatedDate) {
 
+		
 		Date currentDate = new Date();
 		DateTime currentDateTime = JDateUtil.getDateAndTime(currentDate);
 		DateTime txnCreatedDateDateTime = JDateUtil
 				.getDateAndTime(txnCreatedDate);
-		DateTime settlementnDateTime = JDateUtil.getDateAndTime(
-				dailySettlementHr, dailySettlementMin);
 
-		// If execution time is more than scheduled time
-		if (txnCreatedDateDateTime.compareTo(settlementnDateTime) > 0) {
+		// If transaction created time is more than a day old then take the record from DB.
+		Interval lastDay = JDateUtil.getISTPreviousDay();
 
-			return Boolean.FALSE;
+		if (txnCreatedDateDateTime.compareTo(lastDay.getStart()) < 0) {
+			return true;
 		}
+
+		// if it's same day transaction then return false and call corresponding PG's enquiry call else take the data from our DB
+		if(JDateUtil.noOfDays(txnCreatedDateDateTime, currentDateTime) > 1)
+		{
+			return true;
+		}
+		else
+			return false;
 
 		// Is previous day transaction
 
-		Interval lastDay = JDateUtil.getISTPreviousDay();
-		if ((currentDateTime.compareTo(settlementnDateTime) <= 0
-				&& txnCreatedDateDateTime.compareTo(lastDay.getStart()) >= 0 && txnCreatedDateDateTime
-				.compareTo(lastDay.getEnd()) <= 0)
-				|| (txnCreatedDateDateTime.compareTo(lastDay.getEnd()) >= 0 && txnCreatedDateDateTime
-						.compareTo(settlementnDateTime) <= 0)) {
+/*NO NEED to solve		if ((txnCreatedDateDateTime.compareTo(lastDay.getStart()) >= 0 && txnCreatedDateDateTime.compareTo(lastDay.getEnd()) <= 0)) {
 			return Boolean.FALSE;
 		}
-
 		return Boolean.TRUE;
-
+*/
 	}
 
 	/**
@@ -142,7 +144,6 @@ public class CommonUtil {
 		sdf.setTimeZone(timeZone);
 		return sdf.format(calendar.getTime());
 	}
-
 
 
 }

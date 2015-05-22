@@ -45,7 +45,28 @@ public class MerchantKey implements Serializable {
 	@JoinColumn(name = "MER_MERCHANT_ID", nullable = true)
 	private Merchant merchant;
 	
+	private String outKeyString;
+	
+	private String keyString;
 
+	public String getKeyString() {
+		return keyString;
+	}
+
+	public void setKeyString(String keyString) {
+		this.keyString = keyString;
+	}
+
+	public String getOutKeyString() {
+		return outKeyString;
+	}
+
+	public void setOutKeyString(String outKeyString) {
+		this.outKeyString = outKeyString;
+	}
+
+
+	
 	public Integer getId() {
 		return id;
 	}

@@ -11,8 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-import com.citruspay.enquiry.persistence.entity.Issuer;
-
 @SuppressWarnings("serial")
 @Entity
 @DiscriminatorValue(value = "NET_BANKING")

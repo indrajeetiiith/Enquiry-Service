@@ -8,7 +8,6 @@ package com.citruspay.enquiry.persistence.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -22,27 +21,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-
-
-
-import com.citruspay.enquiry.persistence.entity.PricingTransactionHistory;
-import com.citruspay.enquiry.persistence.entity.TransactionType;
-import com.citruspay.enquiry.persistence.entity.ConsumerDetail;
-import com.citruspay.enquiry.persistence.entity.PaymentDetail;
-import com.citruspay.enquiry.persistence.entity.Amount;
-import com.citruspay.enquiry.persistence.entity.Merchant;
-import com.citruspay.enquiry.persistence.entity.TransactionStatus;
 
 @Entity
 @Table(name = "TXN_TRANSACTION")

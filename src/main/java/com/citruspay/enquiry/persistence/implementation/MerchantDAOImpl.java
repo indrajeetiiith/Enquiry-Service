@@ -1,22 +1,14 @@
 package com.citruspay.enquiry.persistence.implementation;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-
-
-
+import com.citruspay.enquiry.persistence.PersistenceManager;
 import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.interfaces.MerchantDAO;
-import com.citruspay.enquiry.persistence.PersistenceManager;
 import com.citruspay.enquiry.persistence.util.KeyType;
-import com.citruspay.CommonUtil;
 
 public class MerchantDAOImpl implements MerchantDAO {
 

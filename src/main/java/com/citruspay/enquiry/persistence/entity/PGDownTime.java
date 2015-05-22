@@ -20,7 +20,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.citruspay.enquiry.persistence.entity.Issuer;
 import com.citruspay.enquiry.type.PaymentType;
 
 @SuppressWarnings("serial")

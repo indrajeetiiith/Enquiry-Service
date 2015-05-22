@@ -23,7 +23,6 @@ import org.hibernate.envers.RelationTargetAuditMode;
 
 import com.citruspay.enquiry.type.GatewayType;
 import com.citruspay.enquiry.type.PGAuthType;
-import com.citruspay.enquiry.persistence.entity.PaymentMode;
 
 @Entity
 @Table(name = "pg_payment_gateway")

@@ -12,6 +12,8 @@ import java.net.URL;
 
 import org.json.JSONObject;
 
+import com.citruspay.enquiry.api.EnquiryRequest;
+
 public class EnquiryRestClient {
 
 	//private static String URI_TEMPLATE = "http://localhost:8080/EnquiryService/service/enquiryService";
@@ -23,7 +25,11 @@ public class EnquiryRestClient {
 	}
 	private static void callFetchJson(String urlCall) {
 		try {
-			 
+			
+			EnquiryRestService service = new EnquiryRestService();
+			EnquiryRequest enquiryRequest = null;
+			System.out.println(" response = "+service.enquiry(enquiryRequest));
+			
 			URL url = new URL(urlCall+"/service/enquiryService");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("POST");
@@ -50,7 +56,9 @@ public class EnquiryRestClient {
             bufferReader.close();
             JSONObject jsonObject = new JSONObject(string);
             System.out.println(jsonObject);
+			//out.write(jsonObject.toString());
 			out.write(jsonObject.toString());
+			
             out.close();
 			if (conn.getResponseCode() != 200) {
 				throw new RuntimeException("Failed : HTTP error code : "

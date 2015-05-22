@@ -23,5 +23,10 @@ public class EnquiryResponse {
 	public void setData(Object data) {
 		Data = data;
 	}
+	@Override
+	public String toString() {
+		return "EnquiryResponse [respCode=" + respCode + ", respMsg=" + respMsg
+				+ ", Data=" + Data + "]";
+	}
 	
 }

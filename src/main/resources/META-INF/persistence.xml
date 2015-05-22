@@ -8,7 +8,7 @@
 		<class>com.citruspay.enquiry.persistence.entity.Merchant</class>
 		<class>com.citruspay.enquiry.persistence.entity.MerchantKey</class>
 		<properties>
-			<property name="hibernate.show_sql" value="false"/>
+			<property name="hibernate.show_sql" value="true"/>
 			<property name="hibernate.format_sql" value="true"/>
 			<property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>
 			<property name="hibernate.connection.charSet" value="UTF-8"/>
@@ -16,7 +16,7 @@
 			<property name="javax.persistence.jdbc.password" value="root" />
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
-			<property name="hibernate.listeners.envers.autoRegister" value="false" />
+			<property name="hibernate.listeners.envers.autoRegister" value="true" />
 			<!-- Audit -->
 			<property name="hibernate.ejb.event.post-insert"
 			value="org.hibernate.ejb.event.EJB3PostInsertEventListener,org.hibernate.envers.event.AuditEventListener" />

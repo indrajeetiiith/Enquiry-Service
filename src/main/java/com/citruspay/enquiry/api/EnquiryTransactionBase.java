@@ -53,6 +53,9 @@ public class EnquiryTransactionBase {
 	private static final String NO_TXN_FOUND = "No transaction found";
 	private static final String ENQUIRY_SUCCESSFULL = "Enquiry successful";
 	private static final String ENQUIRY_FAILURE = "Enquiry failure";
+	private static final String NO_REFUND_TXN_FOUND = "Refund Transaction does not exist";
+	private static final int ERROR_CODE_401 = 401;
+	private static final String ENC_ERROR = "Bad Request:Invalid signature key";
 
 
 	/**
@@ -70,14 +73,8 @@ public class EnquiryTransactionBase {
 			String transactionId =  enquiryRequest.getMerchantTxnId();
 			String signature =  enquiryRequest.getSignature();
 
-			AESEncryptionDecryption aesEncryptionDecryption = new AESEncryptionDecryption();
-			String encrytedText = aesEncryptionDecryption.encrypt(signature);
-			System.out.println("Encryted: " + encrytedText);
-
-
 			if (!IsValidRequest(merchantAccessKey, transactionId,signature)) {
-				LOGGER.error("Enquiry API : Mandatory request parameter missing for enquiry id: "
-						+ transactionId);
+				LOGGER.error("Enquiry API : Mandatory request parameter missing for enquiry id: "+ transactionId);
 				handleValidationError(BAD_REQUEST, BAD_REQUEST_MSG, enquiryResponse);
 				return enquiryResponse;
 				
@@ -94,7 +91,7 @@ public class EnquiryTransactionBase {
 				return enquiryResponse;
 			}
 			//validate signature
-			validateSignature(prepareRequestData(merchantAccessKey),"3831ccddfbea55c440a7c2d3623cf1432033dd4e",merchant);
+			validateSignature(prepareRequestData(merchantAccessKey,transactionId),"3831ccddfbea55c440a7c2d3623cf1432033dd4e",merchant);
 
 			
 			// Get last modified transaction's pg for enquiry call
@@ -107,8 +104,8 @@ public class EnquiryTransactionBase {
 				return enquiryResponse;
 			}
 			
-			// validate merchant refund txnid given in the request no need to check the DB .  put this in PG's enquiry call(however need to get the confirmation)
-/*			String merchantRefundTxId = enquiryRequest.getMerchantRefundTxId();
+			// validate merchant refund txnid given in the request.
+			String merchantRefundTxId = enquiryRequest.getMerchantRefundTxId();
 			if (!CommonUtil.isEmpty(merchantRefundTxId)) {
 				// Get last modified transaction's pg for enquiry call
 				Transaction refundTxn = transactionDAO
@@ -125,7 +122,6 @@ public class EnquiryTransactionBase {
 				}
 
 			}
-*/			
 			PaymentGatewayDAO pgDao = new PaymentGatewayDAOImpl();
 
 			PaymentGateway pg = CommonUtil.isNotNull(txn.getPgId()) ? pgDao.findById(txn.getPgId()) : null;
@@ -146,16 +142,27 @@ public class EnquiryTransactionBase {
 
 			return enquiryResponse;
 		
+		}catch(SignatureValidationException signatureException){
+			LOGGER.error("Signature validation failed",signatureException.getMessage(),signatureException);
+			enquiryResponse.setRespCode(ERROR_CODE_401);
+			enquiryResponse.setRespMsg(ENC_ERROR);
+			
 		}catch (Exception ex) {
 			LOGGER.error(
 					"Enquiry API : Exception during enquiry API call due to : "
 							+ ex.getMessage(), ex);
 		}
-		System.out.println("exiting function enquiry");
 
 		return enquiryResponse;
 	}
 	
+	/**
+	 * This function validates the signature
+	 * @param requestData
+	 * @param signature
+	 * @param merchant
+	 * @throws SignatureValidationException
+	 */
 	protected void validateSignature(String requestData,String signature,Merchant merchant) throws SignatureValidationException {
 		
 		LOGGER.info("Validating signature");
@@ -183,9 +190,6 @@ public class EnquiryTransactionBase {
 					throw new SignatureValidationException();
 				}
 			}
-			else
-				throw new SignatureValidationException();
-
 				
 		} catch (EncryptionException e) {
 			LOGGER.error("Signature was not validated", e);
@@ -316,7 +320,6 @@ public class EnquiryTransactionBase {
 	public static boolean inquiryRespFromCitrusDB(Transaction txn) {
 
 		// display result from citrus DB if transaction status is ON_HOLD
-		//TODO need to confirm with gaurang
 		if (txn.getPaymentDetails() != null && CommonUtil.isCreditOrDebitCard(txn.getPaymentDetails().getPaymentMode())&& TransactionStatus.ON_HOLD.equals(txn.getStatus())) {
 			return true;
 		}
@@ -342,7 +345,6 @@ public class EnquiryTransactionBase {
 		// if transaction creation data and enquiry date is on the same day i.e. txncreateddate is between last day end and current date 
 		if ((txnCreatedDateDateTime.compareTo(lastDay.getEnd()) > 0) && (txnCreatedDateDateTime.compareTo(currentDateTime ) < 0 )) {
 			LOGGER.info("Could not enquire from Citrus DB because of Txncreated date and enquiry request on same  day :: going to call PG txncreated date time:"+txnCreatedDateDateTime + "current date:"+currentDateTime);
-
 			return false;
 		}
 		
@@ -350,8 +352,6 @@ public class EnquiryTransactionBase {
 		{
 			LOGGER.info("Could not enquire from Citrus DB because of Txncreated date is less than a day old :: txncreated date time:"+txnCreatedDateDateTime + "current date:"+currentDateTime+"last day start ="+lastDay.getStart()+" last day end ="+lastDay.getEnd());
 			return false;
-
-			
 		}
 
 
@@ -506,6 +506,11 @@ public class EnquiryTransactionBase {
 		return isRequiredStatus;
 	}
 
+/**	
+ * This function generates the HMAC of a key
+ * @param merchant
+ * @return
+ */
 public MerchantKey getMerchantHMACKey(Merchant merchant) {
 		List<MerchantKey> merchantKeys = getMerchantkeys(merchant);
 		int size = merchantKeys.size();
@@ -519,6 +524,11 @@ public MerchantKey getMerchantHMACKey(Merchant merchant) {
 	}
 
 
+/**
+ * This function gets merchant key from the DB
+ * @param merchant
+ * @return
+ */
 	public List<MerchantKey> getMerchantkeys(Merchant merchant) {
 
 		MerchantKeyDAO merchantKeyDAO = new MerchantKeyDAOImpl();
@@ -527,12 +537,26 @@ public MerchantKey getMerchantHMACKey(Merchant merchant) {
 
 		return merchantKeys;
 	}
-	
-	public String prepareRequestData(String merchantAccessKey) {
+
+	/**
+	 * This function prepares the request data which is to be used for validating the signature
+	 * @param merchantAccessKey
+	 * @param transactionId
+	 * @return
+	 */
+	public String prepareRequestData(String merchantAccessKey, String transactionId) {
 		StringBuilder req = new StringBuilder();
 		req.append(kvPair("merchantAccessKey", merchantAccessKey));
+		req.append("&");
+		req.append(kvPair("transactionId", transactionId));
 		return req.toString();
 	}
+	/**
+	 * This function forms a key value pair for merchant access key and transaction id
+	 * @param k
+	 * @param v
+	 * @return
+	 */
 	private String kvPair(String k, String v) {
 		return String.format("%s=%s", new Object[] { k, v });
 	}

@@ -13,6 +13,7 @@ import com.citruspay.enquiry.persistence.entity.NetBankingPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.PaymentGateway;
 import com.citruspay.enquiry.persistence.entity.Transaction;
 import com.citruspay.enquiry.persistence.entity.TransactionStatus;
+import com.citruspay.enquiry.type.GatewayType;
 public class GatewayServiceImpl {
 	
 	public void updatePaymentDetailAndAddressDetail(Transaction txn, EnquiryResult bean,PaymentGateway pg) {
@@ -144,6 +145,13 @@ public class GatewayServiceImpl {
 			}
 		}
 		return isRequiredStatus;
+	}
+
+	public boolean isExternalGateway(PaymentGateway paymentGateway) {
+
+		return (CommonUtil.isNotNull(paymentGateway) && (GatewayType.EXTERNAl
+				.toString()).equals(paymentGateway.getGatewayType().toString())) ? Boolean.TRUE
+				: Boolean.FALSE;
 	}
 
 	

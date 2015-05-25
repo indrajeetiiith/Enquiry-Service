@@ -29,7 +29,6 @@ import com.citruspay.enquiry.persistence.entity.ImpsPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.entity.MerchantKey;
 import com.citruspay.enquiry.persistence.entity.NetBankingPaymentDetail;
-import com.citruspay.enquiry.persistence.entity.PGTransaction;
 import com.citruspay.enquiry.persistence.entity.PaymentGateway;
 import com.citruspay.enquiry.persistence.entity.Transaction;
 import com.citruspay.enquiry.persistence.entity.TransactionStatus;
@@ -41,8 +40,6 @@ import com.citruspay.enquiry.persistence.interfaces.MerchantKeyDAO;
 import com.citruspay.enquiry.persistence.interfaces.PaymentGatewayDAO;
 import com.citruspay.enquiry.persistence.interfaces.TransactionDAO;
 import com.citruspay.enquiry.persistence.util.KeyType;
-import com.citruspay.enquiry.type.GatewayType;
-import com.citruspay.enquiry.type.PGCode;
 
 public class EnquiryTransactionBase {
 	private static final Logger LOGGER = LoggerFactory
@@ -54,8 +51,8 @@ public class EnquiryTransactionBase {
 	private static final String BAD_REQUEST_MSG = "Merchant mandatory parameter missing";
 	private static final String MERCHANT_NOT_FOUND = "Bad Request: Merchant not found";
 	private static final String NO_TXN_FOUND = "No transaction found";
-	private static final String NO_REFUND_TXN_FOUND = "Refund Transaction does not exist";
 	private static final String ENQUIRY_SUCCESSFULL = "Enquiry successful";
+	private static final String ENQUIRY_FAILURE = "Enquiry failure";
 
 
 	/**
@@ -110,8 +107,8 @@ public class EnquiryTransactionBase {
 				return enquiryResponse;
 			}
 			
-			// validate merchant refund txnid given in the request
-			String merchantRefundTxId = enquiryRequest.getMerchantRefundTxId();
+			// validate merchant refund txnid given in the request no need to check the DB .  put this in PG's enquiry call(however need to get the confirmation)
+/*			String merchantRefundTxId = enquiryRequest.getMerchantRefundTxId();
 			if (!CommonUtil.isEmpty(merchantRefundTxId)) {
 				// Get last modified transaction's pg for enquiry call
 				Transaction refundTxn = transactionDAO
@@ -128,19 +125,19 @@ public class EnquiryTransactionBase {
 				}
 
 			}
-			
+*/			
 			PaymentGatewayDAO pgDao = new PaymentGatewayDAOImpl();
 
 			PaymentGateway pg = CommonUtil.isNotNull(txn.getPgId()) ? pgDao.findById(txn.getPgId()) : null;
 					
-			// fill the enquiry response with the data whatever we have for the time being
-			//TODO read the value for settlement hr and settlement min from the properties file
-			// read value for settlement hour and settlement minute from properties file
+			//check if we can get data from our DB rather than calling enquiry for External PG's. The criterial for fetching data from our DB depends upon various factors such
+			// as if the transaction creation data and enquiry is on the same day. If the status of the transaction is success or success_on_verification. If the transaction's status
+			// is on HOLD etc.
 			if(inquiryRespFromCitrusDB(txn) == true)
 			{
 				LOGGER.info("Enquiry API : Getting enquiry data from Citrus DB");
 				//Take data from Citrus DB and no need to go for External PG's enquiry call 
-				populateEnquiryResponse(enquiryRequest,enquiryResponse,txn,pg,merchantRefundTxId,transactionDAO);
+				populateEnquiryResponse(enquiryRequest,enquiryResponse,txn,pg,enquiryRequest.getMerchantRefundTxId(),transactionDAO);
 			}
 			else
 			{
@@ -202,8 +199,10 @@ public class EnquiryTransactionBase {
 	}
 
 
+
 	/**
-	 * This function populates all the fields of enquiry response 
+	 * This function prepares  enquiry response with required details.
+	 * @param enquiryRequest
 	 * @param enquiryResponse
 	 * @param transaction
 	 * @param pg
@@ -267,15 +266,23 @@ public class EnquiryTransactionBase {
 	
 			}
 		}
+		else {
+				enquiryResponse.setRespCode(RESP_CODE_SUCCESS);
+				enquiryResponse.setRespMsg(ENQUIRY_FAILURE);
+				return;
+			
+		}
 		enquiryResultList.setEnquiryResultList(enquiryResult);
 		enquiryResponse.setData(enquiryResultList);
 				
 	}
 
+
 	/**
-	 * This function validates the merchantAccessKey and transactionId for emptiness and null
+	 * This function validates the merchantAccessKey,transactionId  and signature for emptiness and null
 	 * @param merchantAccessKey
 	 * @param transactionId
+	 * @param signature
 	 * @return
 	 */
 	public boolean IsValidRequest(String merchantAccessKey, String transactionId,String signature)
@@ -298,14 +305,12 @@ public class EnquiryTransactionBase {
 		enquiryResponse.setRespMsg(errorMessage);
 	}
 	
+
 	/**
 	 * This function decides whether the enquiry data can be given from Citrus DB or External PG based on various factors example . if it's previous day transaction and enquiry is done
 	 * or not. If the status of the transaction is FAIL,FORWARD or SESSION_EXPIRED then checks for the date interval. if the enquiry comes before we do an enquiry with the PG
 	 * then this function returns false and then corresponding PG's enquiry call is performed.
 	 * @param txn
-	 * @param dailySettlementTime
-	 * @param dailySettlementMin
-	 * @param pg
 	 * @return
 	 */
 	public static boolean inquiryRespFromCitrusDB(Transaction txn) {

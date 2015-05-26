@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.io.StringReader;
 
 import com.citruspay.CommonUtil;
 import com.citruspay.enquiry.GatewayServiceImpl;
@@ -21,6 +24,7 @@ import com.citruspay.enquiry.api.EnquiryResponse;
 import com.citruspay.enquiry.api.EnquiryResult;
 import com.citruspay.enquiry.api.EnquiryResultList;
 import com.citruspay.enquiry.encryption.AESEncryptionDecryption;
+import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.entity.MerchantGatewaySetting;
 import com.citruspay.enquiry.persistence.entity.PGTransaction;
 import com.citruspay.enquiry.persistence.entity.PaymentGateway;
@@ -30,8 +34,18 @@ import com.citruspay.enquiry.persistence.implementation.TransactionDAOImpl;
 import com.citruspay.enquiry.persistence.interfaces.MerchantGatewaySettingDAO;
 import com.citruspay.enquiry.persistence.interfaces.TransactionDAO;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 
 public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayService{
@@ -40,6 +54,8 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 			.getLogger(HDFC3DGatewayService.class);
 	public static final String hdfcPGUrl ="https://securepgtest.fssnet.co.in/pgway/servlet/TranPortalXMLServlet"; 
 	
+	private final String ERROR_REGEX = "!ERROR!";
+	private final String DATE_PADDING = "XXXXXXXXXX";
 
 	@Override
 	public EnquiryResponse enquiry(Transaction transaction,
@@ -55,7 +71,7 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 		}
 
 		// 2. Setup
-		List<EnquiryResult> inqueryResult = new ArrayList<EnquiryResult>();
+		List<EnquiryResult> enquiryResultList = new ArrayList<EnquiryResult>();
 		boolean mtxflag = Boolean.TRUE;
 		boolean isExternalPG = Boolean.TRUE;
 
@@ -64,7 +80,7 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 			// 3. Get all transactions for MTX and merchant from Citrus DB
 			/*
 			 * First attempt is made with hdfc3D, if no transaction found then
-			 * attempt is made with hfdcCitrus(internalpg)
+			 * attempt is made with hfdcCitrus(internal pg)
 			 */
 			List<Transaction> transactions = null;
 			MerchantGatewaySetting pgSetting = null;
@@ -87,12 +103,11 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 			pgSetting = gatewaySettingDAO.findByMerchantAndGatewayCode(transaction.getMerchant().getId(),
 					paymentGateway.getCode());
 
-			// 1. If transaction does not exist in citrus DB //TODO why are we reading here if we have already done an enquiry whether we need to get it from our DB using funtion inquiryRespFromCitrusDB
-			if (!CommonUtil.isNotEmpty(transactions)) {
+			// 1. If transaction does not exist in citrus DB 
+			if (CommonUtil.isEmpty(transactions)) {
 				enquiryResponse.setRespCode(RESP_CODE_SUCCESS);
 				enquiryResponse.setRespMsg(ENQUIRY_NOT_PRESENT);
 				return enquiryResponse;
-
 			}
 
 			
@@ -106,15 +121,11 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 					if (CommonUtil.isNull(transaction.getPgTxResp())
 							|| CommonUtil.isNull(transaction.getPgTxResp()
 									.getPgTxnId())) {
-						return enquiryResponse; /*TODOprepareEnqiryResult(transactions,
-								merchantRefundTxId);
-*/					}
+						return prepareEnqiryResult(transactions,
+								merchantRefundTxId,paymentGateway);
+					}
 					responseString = doinquiry(txn, pgSetting, mtxflag);
 
-					/*
-					 * If response is null then enquire with Citrus transaction
-					 * id
-					 */
 					repeatEnquiry = (!repeatEnquiry && CommonUtil
 							.isEmpty(responseString)) ? Boolean.TRUE
 							: Boolean.FALSE;
@@ -126,20 +137,9 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 					log.info("Response received for enquiry: "
 							+ responseString.toString());
 
-					EnquiryResult enquiryResult = null;/* TODO indra parseEnquiryResponse(txn,
+					EnquiryResult enquiryResult = parseEnquiryResponse(txn,
 							responseString, txn.getMerchant(),
 							txn.getMerchantTxId(), txn.getTxId(), mtxflag);
-					*/
-					enquiryResult = null;//TODO indra updateInquiryForCardParamater(enquiryResult,transaction);
-					System.out.println("pg.getName().toString()="+paymentGateway.getName().toString());
-					updatePaymentDetailAndAddressDetail(transaction, enquiryResult,paymentGateway);
-					// Update status if required
-					Transaction updatedTransaction = null;/* TODO indra updateCPTransactionStatus(
-							enquiryResult, txn.getMerchantTxId(),
-							txn.getMerchant(), txn.getTxId(),
-							txn.getTransactionType());*/
-
-					// Update result for transaction type
 					enquiryResult.setTxnType(txn.getTransactionType().toString());
 
 					// set merchant refund tx id
@@ -148,39 +148,23 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 					// set MTX
 					enquiryResult.setMerchantTxnId(txn.getMerchantTxId());
 
-					// Update amount if not present in response
-					if (CommonUtil.isNotNull(updatedTransaction)) {
-						enquiryResult
-								.setAmount(CommonUtil
-										.isNotNull(updatedTransaction
-												.getOrderAmount()) ? updatedTransaction
-										.getOrderAmount().getAmount()
-										.toString()
-										: "");
-					}
-
 					// Update date if not present in response
 					if (CommonUtil.isNull(enquiryResult.getTxnDateTime())) {
 						enquiryResult.setTxnDateTime(txn.getCreated().toString());
 					}
 
-					inqueryResult.add(enquiryResult);
+					enquiryResultList.add(enquiryResult);
 
 				}
 
-			}
-
-			// Response list is empty, send data from citrus DB
-			if (!CommonUtil.isNotEmpty(inqueryResult)) {
-				//TODO indra return prepareEnqiryResult(transactions, merchantRefundTxId);
 			}
 
 
 			enquiryResponse.setRespCode(RESP_CODE_SUCCESS);
 			enquiryResponse.setRespMsg(ENQUIRY_SUCCESSFULL);
 
-			EnquiryResultList txnEnquiryResponse = null;/* TODO indra getEnquiryResponse(
-					merchantRefundTxId, inqueryResult);*/
+			EnquiryResultList txnEnquiryResponse = fillEnquiryResponse(
+					merchantRefundTxId, enquiryResultList);
 
 			enquiryResponse.setData(txnEnquiryResponse);
 			return enquiryResponse;
@@ -195,7 +179,7 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 		return enquiryResponse;
 
 	}
-	/**
+	/** This function calls the HDFC's enquiry and gets the response
 	 * @param transaction
 	 * @param pgSetting
 	 * @param mtxflag
@@ -264,33 +248,172 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 		return responseString.toString();
 	}
 	
-/* TODO 	public Transaction updateCPTransactionStatus(EnquiryResult bean,
-			String transactionId, Merchant merchant, String ctx,
-			TransactionType type) {
 
-		int pgResponseCode = CommonUtil.getInteger(bean.getRespCode(), -1);
-
-		Transaction txn = transactionService.findByCTXandMTXIdAndType(ctx,
-				transactionId, merchant, type);
-
-		// Update transaction amount
-		txn = updateTransactionAmount(txn);
-
-		if (CommonUtil.isNotNull(txn)
-				&& (txn.getStatus().ordinal() != pgResponseCode)) {
-			if (txn.getStatus().equals(TransactionStatus.FORWARDED)
-					&& pgResponseCode != 0) {
-				return txn;
-			}
-			return updatePaymentResponseToTransaction(bean.getRespCode(),
-					bean.getRespMsg(), bean.getAuthIdCode(), bean.getRRN(),
-					bean.getTxnId(), bean.getPgTxnId(), null, null, txn, false);
+	/**
+	 * This function tells whether there is error in the response string
+	 * @param input
+	 * @return
+	 */
+	private boolean isErrorInResponse(String input) {
+		if (StringUtils.isEmpty(input)) {
+			return Boolean.TRUE;
 		}
-
-		return txn;
+		Pattern pattern = Pattern.compile(ERROR_REGEX);
+		Matcher matcher = pattern.matcher(input);
+		return (matcher.find()) ? Boolean.TRUE : Boolean.FALSE;
 	}
 
-*/
+	/**
+	 * This function parses the response received from HDFC 's enquiry call
+	 * @param transaction
+	 * @param responseString
+	 * @param merchant
+	 * @param merchantTxnId
+	 * @param ctx
+	 * @param mtxflag
+	 * @return
+	 */
+	private EnquiryResult parseEnquiryResponse(Transaction transaction,
+			String responseString, Merchant merchant, String merchantTxnId,
+			String ctx, boolean mtxflag) {
+
+		EnquiryResult bean = null;
+		try {
+			bean = new EnquiryResult();
+			boolean isError = isErrorInResponse(responseString);
+
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			InputSource is = new InputSource();
+			is.setCharacterStream(new StringReader(responseString));
+
+			Document doc = db.parse(is);
+			NodeList nodes = doc.getElementsByTagName("response");
+			for (int i = 0; i < nodes.getLength(); i++) {
+
+				if (isError) {
+
+					Element element = (Element) nodes.item(i);
+
+					NodeList errorCode = element
+							.getElementsByTagName("error_code_tag");
+					Element line = (Element) errorCode.item(0);
+					String responseCode = getCharacterDataFromElement(line);
+
+					if (STATUS_CAPTURED.equals(responseCode)
+							|| STATUS_SUCCESS.equals(responseCode)
+							|| STATUS_APPROVED.equals(responseCode)) {
+						bean.setRespCode(RESP_CODE_0);
+					} else {
+						bean.setRespCode(RESP_CODE_1);
+					}
+
+					NodeList errorMessage = element
+							.getElementsByTagName("result");
+					line = (Element) errorMessage.item(0);
+					String responseMessage = getCharacterDataFromElement(line);
+					bean.setRespMsg(responseMessage.substring(responseMessage
+							.lastIndexOf("-") + 1));
+
+					// Set merchantTxnId as txnID
+
+					bean.setTxnId((mtxflag) ? merchantTxnId : ctx);
+
+					// TODO : Updating error msg as Transaction Failure for
+					// status code 1
+					if (RESP_CODE_1.equals(bean.getRespCode())) {
+						bean.setRespMsg(TXN_FAILURE);
+					}
+
+				} else {
+
+					Element element = (Element) nodes.item(i);
+
+					NodeList name = element.getElementsByTagName("result");
+					Element line = (Element) name.item(0);
+					String responseCode = getCharacterDataFromElement(line);
+
+					if (STATUS_CAPTURED.equals(responseCode)
+							|| STATUS_SUCCESS.equals(responseCode)
+							|| STATUS_APPROVED.equals(responseCode)) {
+						bean.setRespCode(RESP_CODE_0);
+					} else {
+						bean.setRespCode(RESP_CODE_1);
+					}
+					if (STATUS_CAPTURED.equals(responseCode)) {
+						bean.setTxnType(responseCode);
+					} else {
+						bean.setTxnType(responseCode);
+					}
+
+					bean.setRespMsg(HDFCStatusCode.statusMap.get(responseCode));
+
+					NodeList auth = element.getElementsByTagName("auth");
+					line = (Element) auth.item(0);
+					bean.setAuthIdCode(getCharacterDataFromElement(line));
+
+					NodeList ref = element.getElementsByTagName("ref");
+					line = (Element) ref.item(0);
+					bean.setRRN(getCharacterDataFromElement(line));
+
+					NodeList tranid = element.getElementsByTagName("tranid");
+					line = (Element) tranid.item(0);
+					bean.setPgTxnId(getCharacterDataFromElement(line));
+
+					// TODO : To check if used or not
+					NodeList payid = element.getElementsByTagName("payid");
+					line = (Element) payid.item(0);
+					bean.setTxnId(getCharacterDataFromElement(line));
+					// Changed to make txn id as MTX and not as pgTxnID
+					bean.setTxnId(merchantTxnId);
+
+					NodeList amt = element.getElementsByTagName("amt");
+					line = (Element) amt.item(0);
+					bean.setAmount(getCharacterDataFromElement(line));
+
+					NodeList postDate = element
+							.getElementsByTagName("postdate");
+					line = (Element) postDate.item(0);
+					String orderDate = getCharacterDataFromElement(line);
+					orderDate = DATE_PADDING.substring(0,
+							10 - orderDate.length())
+							+ orderDate;
+
+					bean.setTxnDateTime(orderDate);
+					if (mtxflag) {
+						bean.setTxnId(merchantTxnId);
+					} else {
+						bean.setTxnId(ctx);
+					}
+
+				}
+
+			}
+
+			log.info("Enquiry API response for mtx: " + merchantTxnId
+					+ " code: " + bean.getRespCode() + " msg: "
+					+ bean.getRespMsg());
+
+		} catch (Exception ex) {
+			log.error("Exceprion occurred during parsing enquiry response xml :"
+					+ responseString);
+		}
+
+		return bean;
+	}
+
+	private String getCharacterDataFromElement(Element e) {
+		if (e != null) {
+			Node child = e.getFirstChild();
+			if (child instanceof CharacterData) {
+				CharacterData cd = (CharacterData) child;
+				return cd.getData();
+			}
+			return "";
+		}
+		return null;
+	}
+
 	
 	
 }

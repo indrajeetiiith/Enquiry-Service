@@ -1,5 +1,8 @@
 package com.citruspay;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.citruspay.enquiry.persistence.entity.ConsumerPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.CreditCardPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.DebitCardPaymentDetail;
@@ -7,8 +10,21 @@ import com.citruspay.enquiry.persistence.entity.ImpsPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.NetBankingPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.PaymentDetail;
 import com.citruspay.enquiry.persistence.entity.PaymentMode;
+import com.citruspay.enquiry.persistence.entity.TransactionStatus;
 
 public class PaymentUtil {
+
+	public static boolean isStatusCanclSessionExpireInProgressCOD(
+			TransactionStatus trnStatus) {
+		List<TransactionStatus> trnStatusesList = new ArrayList<TransactionStatus>();
+		trnStatusesList.add(TransactionStatus.CANCELED);
+		trnStatusesList.add(TransactionStatus.SESSION_EXPIRED);
+		trnStatusesList.add(TransactionStatus.IN_PROGRESS);
+		if (trnStatusesList.contains(trnStatus)) {
+			return true;
+		}
+		return false;
+	}
 
 	public static ConsumerPaymentDetail getPaymentDetailsForResponse(
 			PaymentDetail paymentDetail) {

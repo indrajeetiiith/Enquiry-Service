@@ -17,6 +17,7 @@ import com.citruspay.enquiry.api.EnquiryRequest;
 public class EnquiryRestClient {
 
 	//private static String URI_TEMPLATE = "http://localhost:8080/EnquiryService/service/enquiryService";
+	// merchantt txnid:"1413878203327", access key:"5VHM1C4CEUSLOEPO8PH2",
 	private static String URI_TEMPLATE = "http://localhost:8080/EnquiryService";
 
 	public static void main(String[] args) {
@@ -26,10 +27,10 @@ public class EnquiryRestClient {
 	private static void callFetchJson(String urlCall) {
 		try {
 			
-			EnquiryRestService service = new EnquiryRestService();
+		/*	EnquiryRestService service = new EnquiryRestService();
 			EnquiryRequest enquiryRequest = null;
 			System.out.println(" response = "+service.enquiry(enquiryRequest));
-			
+		*/	
 			URL url = new URL(urlCall+"/service/enquiryService");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("POST");

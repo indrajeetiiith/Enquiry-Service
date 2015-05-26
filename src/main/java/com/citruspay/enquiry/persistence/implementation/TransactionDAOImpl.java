@@ -107,7 +107,24 @@ public class TransactionDAOImpl implements TransactionDAO {
 			return null;
 		}
 	}
-	
+
+	public List<Transaction> findByMerchantTxnIdAndGateway(String merTxnId,
+			Merchant merchant, String pgCode) {
+		EntityManager entityManager = null;
+		
+		entityManager = PersistenceManager.INSTANCE.getEntityManager();
+
+		TypedQuery<Transaction> query = entityManager
+				.createQuery(
+						"SELECT txn from Transaction txn WHERE txn.merchantTxId = ?1 and txn.merchant = ?2 and txn.txnGateway like ?3  order by txn.id",
+						Transaction.class);
+		query.setParameter(1, merTxnId);
+		query.setParameter(2, merchant);
+		query.setParameter(3, CommonUtil.JPQL_LIKE + pgCode
+				+ CommonUtil.JPQL_LIKE);
+		return query.getResultList();
+	}
+
 
 
 }

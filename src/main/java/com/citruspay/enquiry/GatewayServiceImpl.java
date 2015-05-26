@@ -154,7 +154,93 @@ public class GatewayServiceImpl {
 				: Boolean.FALSE;
 	}
 
-	
+/*	private TransactionHistory updatePaymentResponseToTransactionHistory(
+			InquiryBean bean, Transaction transaction,
+			TransactionHistory transactionHistoryOld, boolean inqServerCommSts) {
+		TransactionHistory transactionHistory = transactionHistoryService
+				.findById(transactionHistoryOld.getId());
+
+		PGTransaction pgTransaction = transactionHistory.getPgTxResp() != null ? transactionHistory
+				.getPgTxResp() : new PGTransaction();
+
+		String responseCode = bean.getRespCode();
+		String responseMessage = bean.getRespMsg();
+		String authIdCode = bean.getAuthIdCode();
+		String rrn = bean.getRRN();
+		String txnId = bean.getTxnId();
+		String pgTxnId = bean.getPgTxnId();
+		String cvRespCode = bean.getCvResponseCode();
+
+		// if not available will be updated by null
+		if (responseCode != null) {
+			pgTransaction.setResponseCode(responseCode);
+		}
+		if (responseMessage != null) {
+			pgTransaction.setMessage(responseMessage);
+		}
+		if (authIdCode != null) {
+			pgTransaction.setAuthIdCode(authIdCode);
+		}
+		if (rrn != null) {
+			pgTransaction.setIssuerRefNo(rrn);
+		}
+
+		if (pgTxnId != null) {
+			pgTransaction.setPgTxnId(pgTxnId);
+		}
+
+		if (cvRespCode != null) {
+			pgTransaction.setCvRespCode(cvRespCode);
+		}
+
+		if (!CommonUtil.isEmpty(txnId)) {
+			pgTransaction.setTxnId(txnId);
+		} else {
+			pgTransaction.setTxnId(transactionHistory.getTxId());
+		}
+
+		if (responseCode != null) {
+			if ("0".equalsIgnoreCase(responseCode)) {
+				pgTransaction.setErrorMessage(null);
+			}
+		}
+
+		transactionHistory.setPgTxResp(pgTransaction);
+
+		int pgResponseCode = CommonUtil.getInteger(responseCode, -1);
+
+		if (pgResponseCode != 0) {
+			transactionHistory.setStatus(TransactionStatus.FAIL);
+		} else {
+			transactionHistory
+					.setStatus(TransactionStatus.SUCCESS_ON_VERIFICATION);
+			if (CommonUtil.isEmpty(responseMessage)) {
+				pgTransaction.setMessage("Transaction Successful");
+			}
+		}
+
+		transactionHistoryService.saveOrUpdate(transactionHistory);
+
+		if (transactionHistory.getTxId().equals(transaction.getTxId())
+				&& (CommonUtil.isNotNull(transaction) && transaction
+						.getStatus().ordinal() != pgResponseCode)
+				&& !(transaction.getStatus()
+						.equals(TransactionStatus.FORWARDED) && pgResponseCode != 0)) {
+
+			transaction = transactionService.findById(transaction.getId());
+			if (pgResponseCode != 0) {
+				transaction.setStatus(TransactionStatus.FAIL);
+			} else {
+				transaction
+						.setStatus(TransactionStatus.SUCCESS_ON_VERIFICATION);
+			}
+			transaction.setPgTxResp(transactionHistory.getPgTxResp());
+			transactionService.saveOrUpdate(transaction);
+		}
+		return transactionHistory;
+	}
+
+*/	
 }
 
 

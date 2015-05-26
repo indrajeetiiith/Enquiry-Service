@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -27,6 +28,8 @@ public class CommonUtil {
 	public static final String CARDS_NOT_SUPPORTED_BY_MERCHANT = "unsupported";
 	public final static String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	public static final int ONE = 1;
+	public static final String JPQL_LIKE = "%";
+
 
 
 	/**
@@ -143,6 +146,27 @@ public class CommonUtil {
 		SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);
 		sdf.setTimeZone(timeZone);
 		return sdf.format(calendar.getTime());
+	}
+
+	public static String prepareXMLRequest(Map<String, String> parameterMap) {
+
+		StringBuffer sb = new StringBuffer();
+		Set<String> keys = parameterMap.keySet();
+		for (String key : keys) {
+			sb.append("<" + key + ">");
+			sb.append(parameterMap.get(key));
+			sb.append("</" + key + ">");
+		}
+		return sb.toString();
+	}
+
+	public static Integer getInteger(String str, int defaultValue) {
+		try {
+			int intVal = Integer.parseInt(str);
+			return intVal;
+		} catch (Exception ex) {
+			return defaultValue;
+		}
 	}
 
 

@@ -11,9 +11,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-
-
-
 import com.citruspay.enquiry.persistence.PersistenceManager;
 import com.citruspay.enquiry.persistence.entity.MerchantGatewaySetting;
 import com.citruspay.enquiry.persistence.interfaces.MerchantGatewaySettingDAO;
@@ -40,5 +37,24 @@ public class MerchantGatewaySettingDAOImpl implements MerchantGatewaySettingDAO 
 		}
 		return null;
 	}
+	public MerchantGatewaySetting findByMerchantAndGatewayId(Integer merchantId,
+			Integer gatewayId) {
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+
+		List<MerchantGatewaySetting> resultList = null;
+		TypedQuery<MerchantGatewaySetting> query = entityManager
+				.createQuery(
+						"from MerchantGatewaySetting mg where mg.merchant.id=?1 and mg.paymentGateway.id =?2",
+						MerchantGatewaySetting.class);
+		query.setParameter(1, merchantId);
+		query.setParameter(2, gatewayId);
+		resultList = query.getResultList();
+		if (resultList != null && !resultList.isEmpty()) {
+			return resultList.get(0);
+		}
+		return null;
+	}
+
+
 
 }

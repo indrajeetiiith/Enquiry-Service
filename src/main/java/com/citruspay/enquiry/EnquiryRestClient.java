@@ -12,13 +12,11 @@ import java.net.URL;
 
 import org.json.JSONObject;
 
-import com.citruspay.enquiry.api.EnquiryRequest;
-
 public class EnquiryRestClient {
 
 	//private static String URI_TEMPLATE = "http://localhost:8080/EnquiryService/service/enquiryService";
 	// merchantt txnid:"1413878203327", access key:"5VHM1C4CEUSLOEPO8PH2",
-	private static String URI_TEMPLATE = "http://localhost:8080/EnquiryService";
+	private static String URI_TEMPLATE = "http://localhost:8080/enquiry-service";
 
 	public static void main(String[] args) {
 

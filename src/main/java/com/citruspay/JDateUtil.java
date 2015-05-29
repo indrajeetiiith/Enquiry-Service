@@ -6,7 +6,13 @@ O* * Copyright (c) 2012 CitrusPay. All Rights Reserved.
  */
 package com.citruspay;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -20,6 +26,16 @@ public class JDateUtil {
 	
 	public final static String Asia_Kolkata  = "Asia/Kolkata";
 	public final static String UTC  = "UTC";
+	public final static String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+	@SuppressWarnings("serial")
+	private final static List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>() {
+		{
+			add(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss"));
+			add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+		}
+	};
+
 
 
 	/***
@@ -67,6 +83,40 @@ public class JDateUtil {
 		DateTime to = JDateUtil.startOfDay(dateTime);
 		return new Interval(from, to);
 	}
+
+	public static String getPGDate(String dateString) {
+		SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);
+		String formatedDate = null;
+		Date date = null;
+		for (SimpleDateFormat simpleDateFormat : dateFormats) {
+			try {
+				date = simpleDateFormat.parse(dateString);
+			} catch (ParseException ex) {
+				log.error("Parsing exception,continue with another format");
+			}
+			if (CommonUtil.isNotNull(date)) {
+				formatedDate = sdf.format(date);
+				break;
+			}
+		}
+
+		return formatedDate;
+
+	}
+	public static String getDateStringInIST(Date date) {
+
+		Calendar calendar = Calendar.getInstance();
+		TimeZone timeZone = TimeZone.getTimeZone("GMT+05:30");
+		calendar.setTime(date);
+		SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);
+		sdf.setTimeZone(timeZone);
+		return sdf.format(calendar.getTime());
+	}
+	public static String getDateString(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);
+		return sdf.format(date);
+	}
+
 
 
 }

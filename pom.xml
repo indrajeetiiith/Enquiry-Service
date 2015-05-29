@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.citruspay.enquiry</groupId>
-  <artifactId>EnquiryService</artifactId>
+  <artifactId>enquiry-service</artifactId>
   <packaging>war</packaging>
   <version>1.0.1-SNAPSHOT</version>
-  <name>EnquiryService</name>
+  <name>enquiry-service</name>
   <url>http://maven.apache.org</url>
     	<properties>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -20,6 +20,63 @@
   
   <dependencies>
 
+		<dependency>
+			<groupId>billdesk</groupId>
+			<artifactId>billdesk-checksum</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.lyra</groupId>
+			<artifactId>payzen-api</artifactId>
+			<version>4.4.1</version>
+		</dependency>
+		
+
+		<dependency>
+			<groupId>iciciimps</groupId>
+			<artifactId>i-sfa</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>bob</groupId>
+			<artifactId>bob-sfa</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>ubi</groupId>
+			<artifactId>ubi-sfa</artifactId>
+			<version>1.0.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax</groupId>
+					<artifactId>javaee-web-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>icici</groupId>
+			<artifactId>icici-sfa</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>opus</groupId>
+			<artifactId>cryptix32</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>14.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+
+		
    		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -196,7 +253,7 @@
 		    
   </dependencies>
   <build>
-    <finalName>EnquiryService</finalName>
+    <finalName>enquiry-service</finalName>
     			<plugins>
     			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

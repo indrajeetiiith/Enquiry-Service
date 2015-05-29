@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -14,15 +15,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.StringReader;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import com.citruspay.CommonUtil;
 import com.citruspay.enquiry.GatewayServiceImpl;
 import com.citruspay.enquiry.api.EnquiryResponse;
-
-
 import com.citruspay.enquiry.api.EnquiryResult;
 import com.citruspay.enquiry.api.EnquiryResultList;
+import com.citruspay.enquiry.configuration.AppConfigManager;
 import com.citruspay.enquiry.encryption.AESEncryptionDecryption;
 import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.entity.MerchantGatewaySetting;
@@ -34,27 +46,13 @@ import com.citruspay.enquiry.persistence.implementation.TransactionDAOImpl;
 import com.citruspay.enquiry.persistence.interfaces.MerchantGatewaySettingDAO;
 import com.citruspay.enquiry.persistence.interfaces.TransactionDAO;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 
 public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayService{
 
 	private static final Logger log = LoggerFactory
 			.getLogger(HDFC3DGatewayService.class);
-	public static final String hdfcPGUrl ="https://securepgtest.fssnet.co.in/pgway/servlet/TranPortalXMLServlet"; 
+	public static final String hdfcPGUrl =AppConfigManager.INSTANCE.getAppConfig().getPropertiesWithPrefix("hdfc3d.nonenrolled").getProperty("url"); 
 	
-	private final String ERROR_REGEX = "!ERROR!";
 	private final String DATE_PADDING = "XXXXXXXXXX";
 
 	@Override
@@ -130,7 +128,7 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 							.isEmpty(responseString)) ? Boolean.TRUE
 							: Boolean.FALSE;
 
-				} while (repeatEnquiry);
+				} while (repeatEnquiry);// keep calling till the response string is not null 
 
 				/** Process response */
 				if (!CommonUtil.isEmpty(responseString.toString())) {
@@ -140,6 +138,19 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 					EnquiryResult enquiryResult = parseEnquiryResponse(txn,
 							responseString, txn.getMerchant(),
 							txn.getMerchantTxId(), txn.getTxId(), mtxflag);
+					
+					
+					updateInquiryForCardParamater(enquiryResult,transaction);
+					updatePaymentDetailAndAddressDetail(transaction, enquiryResult,paymentGateway);
+					// Update status if required
+
+					//TODO indra need to update the transactionstatus to the table
+					
+					System.out.println(" pgResponseCode ="+enquiryResult.getRespCode()+" pgresp=CommonUtil.getInteger(bean.getRespCode(), -1);="+CommonUtil.getInteger(enquiryResult.getRespCode(),-1)
+							
+							
+							+"txn.getStatus()="+txn.getStatus());
+
 					enquiryResult.setTxnType(txn.getTransactionType().toString());
 
 					// set merchant refund tx id
@@ -250,21 +261,8 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 	
 
 	/**
-	 * This function tells whether there is error in the response string
-	 * @param input
-	 * @return
-	 */
-	private boolean isErrorInResponse(String input) {
-		if (StringUtils.isEmpty(input)) {
-			return Boolean.TRUE;
-		}
-		Pattern pattern = Pattern.compile(ERROR_REGEX);
-		Matcher matcher = pattern.matcher(input);
-		return (matcher.find()) ? Boolean.TRUE : Boolean.FALSE;
-	}
-
-	/**
 	 * This function parses the response received from HDFC 's enquiry call
+
 	 * @param transaction
 	 * @param responseString
 	 * @param merchant
@@ -273,6 +271,7 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 	 * @param mtxflag
 	 * @return
 	 */
+
 	private EnquiryResult parseEnquiryResponse(Transaction transaction,
 			String responseString, Merchant merchant, String merchantTxnId,
 			String ctx, boolean mtxflag) {
@@ -402,6 +401,11 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 		return bean;
 	}
 
+	/**
+	 * This function gets the data from a particular element
+	 * @param e
+	 * @return
+	 */
 	private String getCharacterDataFromElement(Element e) {
 		if (e != null) {
 			Node child = e.getFirstChild();
@@ -413,6 +417,7 @@ public class HDFC3DGatewayService extends GatewayServiceImpl implements GatewayS
 		}
 		return null;
 	}
+
 
 	
 	

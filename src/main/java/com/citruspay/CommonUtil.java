@@ -6,7 +6,6 @@
  */
 package com.citruspay;
 
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,6 +28,12 @@ public class CommonUtil {
 	public final static String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	public static final int ONE = 1;
 	public static final String JPQL_LIKE = "%";
+	public static final long HUNDRED = 100;
+	public static final String ZERO_STRING = "0";
+	public static final int INT_FOUR = 4;
+	public static final int INT_ZERO = 0;
+	public static final int CONST_ONE = 1;
+
 
 
 
@@ -169,5 +174,6 @@ public class CommonUtil {
 		}
 	}
 
+	
 
 }

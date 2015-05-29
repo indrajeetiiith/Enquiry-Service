@@ -14,4 +14,8 @@ public interface MerchantGatewaySettingDAO {
 
 	public MerchantGatewaySetting findByMerchantAndGatewayCode(Integer merchantId,
 			String gatewayCode);
+	public MerchantGatewaySetting findByMerchantAndGatewayId(Integer merchantId,
+			Integer gatewayId);
+
+
 }

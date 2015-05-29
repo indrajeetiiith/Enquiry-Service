@@ -1,7 +1,6 @@
 package com.citruspay.enquiry.configuration.innerconfig;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -38,14 +37,9 @@ public class AppConfig {
 
 		try {
 			
-			LOGGER.info(" path for file ="+	"properties" + File.separatorChar + "enquiry-service.properties" );	
 			ClassLoader classLoader = getClass().getClassLoader();
 			InputStream resourceAsStream = classLoader.getResourceAsStream("properties"+File.separatorChar+"enquiry-service.properties");
-//			FileInputStream dir = new FileInputStream("");
-
 			properties.load(resourceAsStream);
-		//	InputStream in = getClass().getClassLoader().getResourceAsStream("enquiry-service.properties"); 
-		//	properties.load(in);
 			
 		} catch (Exception e) {
 			LOGGER.error("Error while loading properties", e);

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.citruspay.enquiry.persistence.entity.Merchant;
 import com.citruspay.enquiry.persistence.entity.Transaction;
+import com.citruspay.enquiry.persistence.entity.TransactionType;
 
 public interface TransactionDAO {
 
@@ -19,6 +20,11 @@ public interface TransactionDAO {
 			String merchantRefundTxId, Merchant merchant);
 	public List<Transaction> findByMerchantTxnIdAndGateway(String merTxnId,
 			Merchant merchant, String pgCode);
+	public Transaction findByCTXandMTXIdAndType(String transactionId,
+			String merchantTxId, Merchant merchant, TransactionType type);
+	public Transaction saveOrUpdate(Transaction transaction);
+	public List<Transaction> findListByCitrusTransactionId(String ctx);
+
 	
 
 

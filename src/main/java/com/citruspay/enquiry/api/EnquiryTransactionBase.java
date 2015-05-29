@@ -4,11 +4,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-
-
-
-
+import java.util.Properties;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -16,13 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.citruspay.CommonUtil;
+import com.citruspay.HMacUtil;
 import com.citruspay.JDateUtil;
 import com.citruspay.PaymentUtil;
+import com.citruspay.enquiry.configuration.AppConfigManager;
 import com.citruspay.enquiry.encryption.AESEncryptionDecryption;
 import com.citruspay.enquiry.exceptions.EncryptionException;
 import com.citruspay.enquiry.exceptions.SignatureValidationException;
 import com.citruspay.enquiry.gateway.GatewayServiceFactory;
-import com.citruspay.HMacUtil;
 import com.citruspay.enquiry.persistence.entity.Address;
 import com.citruspay.enquiry.persistence.entity.ConsumerPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.CreditCardPaymentDetail;
@@ -68,7 +65,7 @@ public class EnquiryTransactionBase {
 	public EnquiryResponse enquiry(EnquiryRequest enquiryRequest) {
 
 		EnquiryResponse enquiryResponse = new EnquiryResponse();
-		
+
 		try {
 			// Validate request parameters
 			String merchantAccessKey = enquiryRequest.getMerchantAccessKey();
@@ -92,7 +89,7 @@ public class EnquiryTransactionBase {
 				return enquiryResponse;
 			}
 			//validate signature
-			validateSignature(prepareRequestData(merchantAccessKey,transactionId),"f53050c86bac4ca2f00b0154affc849c685f9853",merchant);
+			validateSignature(prepareRequestData(merchantAccessKey,transactionId),signature,merchant);
 
 			
 			// Get last modified transaction's pg for enquiry call
@@ -130,17 +127,15 @@ public class EnquiryTransactionBase {
 			//check if we can get data from our DB rather than calling enquiry for External PG's. The criterial for fetching data from our DB depends upon various factors such
 			// as if the transaction creation data and enquiry is on the same day. If the status of the transaction is success or success_on_verification. If the transaction's status
 			// is on HOLD etc.
-			//if(inquiryRespFromCitrusDB(txn) == true)
+		/*	if(inquiryRespFromCitrusDB(txn) == true)
 			{
 				LOGGER.info("Enquiry API : Getting enquiry data from Citrus DB");
-				//Take data from Citrus DB and no need to go for External PG's enquiry call 
-				//populateEnquiryResponse(enquiryRequest,enquiryResponse,txn,pg,enquiryRequest.getMerchantRefundTxId(),transactionDAO);
+				populateEnquiryResponse(enquiryRequest,enquiryResponse,txn,pg,enquiryRequest.getMerchantRefundTxId(),transactionDAO);
 			}
-			//else
-			{
+			else
+		*/	{
 				//TODO call corresponding PG's enquiry , parse the response and fill the response and return;
-				enquiryResponse =new GatewayServiceFactory().getGatewayService(txn.getTxnGateway()).enquiry(txn, merchantRefundTxId,pg);
-				// Response received for enquiry: <response><result>CAPTURED</result><auth>999999</auth><ref>514665241825</ref><avr>N</avr><postdate>0527</postdate><tranid>221784461251461</tranid><trackid>26MayTxn3</trackid><payid>-987
+				enquiryResponse = new GatewayServiceFactory().getGatewayService(txn.getTxnGateway()).enquiry(txn, merchantRefundTxId,pg);
 			}
 
 			return enquiryResponse;
@@ -155,6 +150,7 @@ public class EnquiryTransactionBase {
 					"Enquiry API : Exception during enquiry API call due to : "
 							+ ex.getMessage(), ex);
 		}
+		LOGGER.info("Enquiry API : exiting from function enquiry");
 
 		return enquiryResponse;
 	}
@@ -552,7 +548,6 @@ public MerchantKey getMerchantHMACKey(Merchant merchant) {
 		req.append(kvPair("merchantAccessKey", merchantAccessKey));
 		req.append("&");
 		req.append(kvPair("transactionId", transactionId));
-		System.out.println( " request string ="+req.toString());
 		return req.toString();
 	}
 	/**

@@ -17,12 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
-
-import com.citruspay.enquiry.persistence.entity.Merchant;
 
 @Entity
 @Table(name = "mer_pg_setting")
@@ -71,12 +67,22 @@ public class MerchantGatewaySetting implements Serializable {
 	private String paymentHashKey;
 	
 	
-	/*TODO indra commenting for the time being@OneToOne
+	
+	@OneToOne
 	@JoinColumn(name="amex_cat_code_id")
-	@Cascade(value=CascadeType.SAVE_UPDATE)
 	@Audited(targetAuditMode=RelationTargetAuditMode.NOT_AUDITED)
 	private MerchantPGCategoryCode merchantPGCategoryCode;
-	*/
+	
+	
+	public MerchantPGCategoryCode getMerchantPGCategoryCode() {
+		return merchantPGCategoryCode;
+	}
+
+	public void setMerchantPGCategoryCode(
+			MerchantPGCategoryCode merchantPGCategoryCode) {
+		this.merchantPGCategoryCode = merchantPGCategoryCode;
+	}
+
 	public String getMpiId() {
 		return mpiId;
 	}

@@ -3,7 +3,10 @@ package com.citruspay.enquiry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -13,6 +16,7 @@ import com.citruspay.enquiry.api.EnquiryResponse;
 import com.citruspay.enquiry.api.EnquiryResult;
 import com.citruspay.enquiry.api.EnquiryResultList;
 import com.citruspay.enquiry.gateway.GatewayService;
+import com.citruspay.enquiry.persistence.entity.ATMCardPaymentDetails;
 import com.citruspay.enquiry.persistence.entity.Address;
 import com.citruspay.enquiry.persistence.entity.ConsumerPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.CreditCardPaymentDetail;
@@ -21,6 +25,7 @@ import com.citruspay.enquiry.persistence.entity.ImpsPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.NetBankingPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.PGTransaction;
 import com.citruspay.enquiry.persistence.entity.PaymentGateway;
+import com.citruspay.enquiry.persistence.entity.PrepaidPaymentDetail;
 import com.citruspay.enquiry.persistence.entity.Transaction;
 import com.citruspay.enquiry.persistence.entity.TransactionHistory;
 import com.citruspay.enquiry.persistence.entity.TransactionStatus;
@@ -64,6 +69,17 @@ public abstract class GatewayServiceImpl implements GatewayService{
 								.getPaymentDetails();
 						bean.setIssuerCode(paymntDetails.getBank().getCode());
 
+						
+					} else if (txn.getPaymentDetails() instanceof PrepaidPaymentDetail) {
+						PrepaidPaymentDetail paymntDetails = (PrepaidPaymentDetail) txn
+								.getPaymentDetails();
+
+						ConsumerPaymentDetail conPaymntDetails = PaymentUtil
+								.getPaymentDetailsForResponse(paymntDetails);
+
+						bean.setMaskedCardNumber(conPaymntDetails
+								.getMaskedCardNumber());
+
 					} else if (txn.getPaymentDetails() instanceof ImpsPaymentDetail) {
 						ImpsPaymentDetail paymntDetails = (ImpsPaymentDetail) txn
 								.getPaymentDetails();
@@ -75,6 +91,12 @@ public abstract class GatewayServiceImpl implements GatewayService{
 						bean.setImpsMobileNumber(conPaymntDetails
 								.getMobileNumber());
 					}
+					 else if (txn.getPaymentDetails() instanceof ATMCardPaymentDetails) {
+							ATMCardPaymentDetails atmCardDetails = (ATMCardPaymentDetails) txn
+									.getPaymentDetails();
+							
+							bean.setCardType(atmCardDetails.getCardType());
+						}
 					bean.setPaymentMode(txn.getPaymentDetails()
 							.getPaymentMode().toString());
 				}
@@ -168,99 +190,11 @@ public abstract class GatewayServiceImpl implements GatewayService{
 				.toString()).equals(paymentGateway.getGatewayType().toString())) ? Boolean.TRUE
 				: Boolean.FALSE;
 	}
-
-/*	private TransactionHistory updatePaymentResponseToTransactionHistory(
-			InquiryBean bean, Transaction transaction,
-			TransactionHistory transactionHistoryOld, boolean inqServerCommSts) {
-		TransactionHistory transactionHistory = transactionHistoryService
-				.findById(transactionHistoryOld.getId());
-
-		PGTransaction pgTransaction = transactionHistory.getPgTxResp() != null ? transactionHistory
-				.getPgTxResp() : new PGTransaction();
-
-		String responseCode = bean.getRespCode();
-		String responseMessage = bean.getRespMsg();
-		String authIdCode = bean.getAuthIdCode();
-		String rrn = bean.getRRN();
-		String txnId = bean.getTxnId();
-		String pgTxnId = bean.getPgTxnId();
-		String cvRespCode = bean.getCvResponseCode();
-
-		// if not available will be updated by null
-		if (responseCode != null) {
-			pgTransaction.setResponseCode(responseCode);
-		}
-		if (responseMessage != null) {
-			pgTransaction.setMessage(responseMessage);
-		}
-		if (authIdCode != null) {
-			pgTransaction.setAuthIdCode(authIdCode);
-		}
-		if (rrn != null) {
-			pgTransaction.setIssuerRefNo(rrn);
-		}
-
-		if (pgTxnId != null) {
-			pgTransaction.setPgTxnId(pgTxnId);
-		}
-
-		if (cvRespCode != null) {
-			pgTransaction.setCvRespCode(cvRespCode);
-		}
-
-		if (!CommonUtil.isEmpty(txnId)) {
-			pgTransaction.setTxnId(txnId);
-		} else {
-			pgTransaction.setTxnId(transactionHistory.getTxId());
-		}
-
-		if (responseCode != null) {
-			if ("0".equalsIgnoreCase(responseCode)) {
-				pgTransaction.setErrorMessage(null);
-			}
-		}
-
-		transactionHistory.setPgTxResp(pgTransaction);
-
-		int pgResponseCode = CommonUtil.getInteger(responseCode, -1);
-
-		if (pgResponseCode != 0) {
-			transactionHistory.setStatus(TransactionStatus.FAIL);
-		} else {
-			transactionHistory
-					.setStatus(TransactionStatus.SUCCESS_ON_VERIFICATION);
-			if (CommonUtil.isEmpty(responseMessage)) {
-				pgTransaction.setMessage("Transaction Successful");
-			}
-		}
-
-		transactionHistoryService.saveOrUpdate(transactionHistory);
-
-		if (transactionHistory.getTxId().equals(transaction.getTxId())
-				&& (CommonUtil.isNotNull(transaction) && transaction
-						.getStatus().ordinal() != pgResponseCode)
-				&& !(transaction.getStatus()
-						.equals(TransactionStatus.FORWARDED) && pgResponseCode != 0)) {
-
-			transaction = transactionService.findById(transaction.getId());
-			if (pgResponseCode != 0) {
-				transaction.setStatus(TransactionStatus.FAIL);
-			} else {
-				transaction
-						.setStatus(TransactionStatus.SUCCESS_ON_VERIFICATION);
-			}
-			transaction.setPgTxResp(transactionHistory.getPgTxResp());
-			transactionService.saveOrUpdate(transaction);
-		}
-		return transactionHistory;
-	}
-
-*/	
 	protected EnquiryResponse prepareEnqiryResult(List<Transaction> transactions, String merchantRefundTxId,PaymentGateway pg) {
 		List<EnquiryResult> enqiryResult = new ArrayList<EnquiryResult>();
 		if (CommonUtil.isNotEmpty(transactions)) {
 			for (Transaction tx : transactions) {
-				EnquiryResult bean = createInquiryBean(tx, null, false,pg);
+				EnquiryResult bean = createInquiryBean(tx, null,pg);
 				enqiryResult.add(bean);
 			}
 		}
@@ -296,7 +230,7 @@ public abstract class GatewayServiceImpl implements GatewayService{
 
 	
 	protected EnquiryResult createInquiryBean(Transaction tx,
-			TransactionHistory txnHistory, Boolean isHistEnq,PaymentGateway pg) {
+			TransactionHistory txnHistory,PaymentGateway pg) {
 		EnquiryResult bean = new EnquiryResult();
 
 		String respCode = "0";
@@ -335,11 +269,7 @@ public abstract class GatewayServiceImpl implements GatewayService{
 		bean.setMerchantTxnId(tx.getMerchantTxId());
 		
 		// Update payment detail
-		if (isHistEnq) {
-			updatePaymentDetailAndAddressDetailForHistory(tx, txnHistory, bean,pg);
-		} else {
-			updatePaymentDetailAndAddressDetail(tx, bean,pg);
-		}
+		updatePaymentDetailAndAddressDetail(tx, bean,pg);
 		PGTransaction pgTxn = tx.getPgTxResp();
 		if (pgTxn != null) {
 			bean.setPgTxnId(pgTxn.getPgTxnId());
@@ -405,57 +335,6 @@ public void updateInquiryForCardParamater(EnquiryResult inquiryBean, Transaction
 	}
 
 	
-	public EnquiryResult updatePaymentDetailAndAddressDetailForHistory(Transaction txn,
-			TransactionHistory txnHistory, EnquiryResult bean,PaymentGateway pg) {
-
-		if (CommonUtil.isNotNull(txnHistory) && isRequiredStatus(txnHistory)) {
-			if (CommonUtil.isNotNull(txnHistory.getTxnGateway())) {
-				String transactionGatewayName = pg.getName().toString();
-				bean.setTxnGateway(transactionGatewayName);
-
-				if (CommonUtil.isNotNull(txnHistory.getPaymentDetails())) {
-
-					if (txnHistory.getPaymentDetails() instanceof CreditCardPaymentDetail) {
-						CreditCardPaymentDetail paymntDetails = (CreditCardPaymentDetail) txnHistory
-								.getPaymentDetails();
-						ConsumerPaymentDetail conPaymntDetails = PaymentUtil
-								.getPaymentDetailsForResponse(paymntDetails);
-
-						bean.setMaskedCardNumber(conPaymntDetails
-								.getMaskedCardNumber());
-						bean.setCardType(paymntDetails.getCardType());
-					} else if (txnHistory.getPaymentDetails() instanceof DebitCardPaymentDetail) {
-						DebitCardPaymentDetail paymntDetails = (DebitCardPaymentDetail) txnHistory
-								.getPaymentDetails();
-
-						ConsumerPaymentDetail conPaymntDetails = PaymentUtil
-								.getPaymentDetailsForResponse(paymntDetails);
-
-						bean.setMaskedCardNumber(conPaymntDetails
-								.getMaskedCardNumber());
-						bean.setCardType(paymntDetails.getCardType());
-					} else if (txnHistory.getPaymentDetails() instanceof NetBankingPaymentDetail) {
-						NetBankingPaymentDetail paymntDetails = (NetBankingPaymentDetail) txnHistory
-								.getPaymentDetails();
-						bean.setIssuerCode(paymntDetails.getBank().getCode());
-
-					}
-					bean.setPaymentMode(txnHistory.getPaymentDetails().getPaymentMode().toString());
-				}
-			}
-		}
-
-		// update currency
-		bean.setCurrency(txn.getOrderAmount().getCurrency());
-
-		// update Pricing Transaction History if present
-		// updatePricingTransactionHistory(txn, bean);
-
-		addAddressDetails(bean, txn);
-		
-		return bean;
-	}
-
 
 	public boolean isRequiredStatus(TransactionHistory txnHistory) {
 		Boolean isRequiredStatus = Boolean.TRUE;
@@ -467,6 +346,44 @@ public void updateInquiryForCardParamater(EnquiryResult inquiryBean, Transaction
 			}
 		}
 		return isRequiredStatus;
+	}
+
+	protected boolean isRefundableTransaction(Transaction transaction) {
+
+		return (CommonUtil.isNotNull(transaction) && (transaction
+				.getTransactionType().toString()
+				.equals(TransactionType.SALE.toString())
+				|| transaction.getTransactionType().toString()
+						.equals(TransactionType.PREAUTH.toString())
+				|| transaction.getTransactionType().toString()
+						.equals(TransactionType.LOAD.toString()) || transaction
+				.getTransactionType().toString()
+				.equals(TransactionType.RELOAD.toString()))) ? Boolean.TRUE
+				: Boolean.FALSE;
+	}
+
+	protected String null2unknown(String in, Map<String, String> responseFields) {
+		if (CommonUtil.isNull(in) || in.length() == 0
+				|| CommonUtil.isNull((String) responseFields.get(in))) {
+			return "No Value Returned";
+		} else {
+			return (String) responseFields.get(in);
+		}
+	}
+
+
+	/**
+	 * This function tells whether there is error in the response string
+	 * @param input
+	 * @return
+	 */
+	protected boolean isErrorInResponse(String input) {
+		if (StringUtils.isEmpty(input)) {
+			return Boolean.TRUE;
+		}
+		Pattern pattern = Pattern.compile(ERROR_REGEX);
+		Matcher matcher = pattern.matcher(input);
+		return (matcher.find()) ? Boolean.TRUE : Boolean.FALSE;
 	}
 
 	
